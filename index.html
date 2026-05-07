@@ -771,9 +771,11 @@ async function loadCheckin(){
     $('discountInfo').innerHTML=`当前折扣: ${Number(discount)/100}% ${discount>=5000n?'🎉':''}<br>
       ${streak<7?`还差 ${7-streak} 天到 9 折`:streak<14?`还差 ${14-streak} 天到 8 折`:streak<30?`还差 ${30-streak} 天到 5 折`:'🎉 5折满级'}`;
     
+    // 按钮始终绑定签到函数（catch 之后也有效）
     const btn=$('checkinBtn');
+    btn.onclick=doCheckIn;
     if(ci){btn.textContent='✅ 今日已签到';btn.disabled=true;btn.style.background='rgba(0,212,255,.1)';}
-    else{btn.textContent='🔥 签到领奖励';btn.disabled=false;btn.removeAttribute('style');btn.onclick=doCheckIn;}
+    else{btn.textContent='🔥 签到领奖励';btn.disabled=false;btn.removeAttribute('style');}
     
     // 徽章
     if(badgeC){
@@ -798,11 +800,9 @@ async function loadCheckin(){
 
 async function doCheckIn(){
   if(!address||!tv){
-    alert('请先连接钱包');
     status('请先连接钱包','error');
     return;
   }
-  alert('签到开始...');
   try{
     status('⏳ 签到中...','');
     const tx=await tv.checkIn();
