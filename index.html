@@ -589,20 +589,6 @@ async function showPoll(pid){
         </a>
       </div>
     </div>`;
-    
-    html+=`<div style="margin-top:8px">
-      <div style="display:flex;gap:4px">
-        <input type="number" id="voteTimes" value="1" min="1" style="flex:1;text-align:center">
-        <span class="text-xs" style="padding:12px 0;color:#888">× ${ethers.formatEther(poll.voteCost)} TVT/票</span>
-      </div>
-    </div>
-    
-    <div style="margin-top:4px;text-align:center">
-      <a href="/?poll=${pid}&claim=1" style="display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border-radius:8px;background:rgba(0,212,255,0.08);border:1px dashed rgba(0,212,255,0.3);color:#00d4ff;font-size:12px;text-decoration:none;transition:all .2s"
-         onmouseover="this.style.background='rgba(0,212,255,0.15)'" onmouseout="this.style.background='rgba(0,212,255,0.08)'">
-        🚰 没有 TVT？免费领取 →
-      </a>
-    </div>`;
 
     // 管理员按钮
     if(address&&(poll.creator.toLowerCase()===address.toLowerCase()||true)){
