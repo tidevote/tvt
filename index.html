@@ -318,7 +318,7 @@ function getMobileWalletLink(){
   const url = encodeURIComponent(location.href);
   return {
     metamask: 'https://metamask.app.link/dapp/' + location.host + location.pathname + location.search,
-    okx: 'okx://wallet/dapp/url?dappUrl=' + encodeURIComponent(location.href)
+    okx: 'okxwallet://wallet/dapp/url?dappUrl=' + encodeURIComponent(location.href) + '|' + 'https://www.okx.com/web3/deeplink?type=wallet_dapp_view&url=' + encodeURIComponent(location.href)
   };
 }
 
@@ -355,10 +355,10 @@ async function connect(){
       walletBtns.style.cssText='display:flex;gap:8px;margin-bottom:12px';
       walletBtns.innerHTML=
         '<a href="'+links.metamask+'" style="flex:1;padding:12px;border-radius:10px;background:#f6851b;color:#fff;text-align:center;text-decoration:none;font-size:14px;font-weight:600">🦊 MetaMask</a>'+
-        '<a href="'+links.okx+'" style="flex:1;padding:12px;border-radius:10px;background:#121212;color:#fff;text-align:center;text-decoration:none;font-size:14px;font-weight:600">⭕ OKX 钱包</a>';
+        '<button onclick="navigator.clipboard.writeText(location.href);status(\"✅ 链接已复制！打开 OKX App → 底部 Wallet → 点右上浏览器图标 → 粘贴访问\",\"success\")" style="flex:1;padding:12px;border-radius:10px;background:#121212;color:#fff;text-align:center;border:none;font-size:14px;font-weight:600;cursor:pointer">⭕ OKX 钱包</button>';
       btn.parentNode.insertBefore(walletBtns, btn.nextSibling);
       
-      status('💡 点上方按钮跳转到 MetaMask/OKX App 内打开，自动连接钱包','');
+      status('💡 手机用户推荐用 MetaMask App 打开，或复制链接到 OKX 钱包浏览器中访问','');
     }else{
       status('⚠️ 请安装 MetaMask 浏览器插件（chrome应用商店搜索 MetaMask）','error');
     }
