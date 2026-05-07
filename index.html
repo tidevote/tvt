@@ -655,7 +655,10 @@ async function showPoll(pid){
     };
     const ta = document.getElementById('shareText_'+pid);
     if(ta) ta.value = presets['中文'];
-  }catch(e){var em=e&&e.message?e.message.slice(0,55):'?';$('pollDetail').innerHTML='<button class="back-btn" onclick="location.href=\'/\'">← 返回</button><div class="text-xs text-center" style="padding:40px;color:#ff4444">加载失败</div><div class="text-xs text-center" style="padding:4px;color:#ffa500;font-size:11px">错误:'+em+'</div>'}
+  }catch(e){
+  var em2=e&&e.message?e.message.slice(0,55):'?';
+  $('pollDetail').innerHTML='<button class="back-btn" id="backBtn' + Date.now() + '" onclick="window.location.href='/'" style="">← 返回</button><div class="text-xs text-center" style="padding:40px;color:#ff4444">加载失败</div>'+ (em2!=='?'?'<div class="text-xs text-center" style="padding:4px;color:#ffa500;font-size:11px">'+em2+'</div>':'');
+}
 }
 
 // ============ 分享工具 ============
