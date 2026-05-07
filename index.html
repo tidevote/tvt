@@ -488,7 +488,7 @@ async function loadPolls(){
       }catch(e){}
     }
     $('tabPolls').innerHTML=html;
-  }catch(e){$('tabPolls').innerHTML='<div class="text-xs text-center" style="padding:40px;color:#ff4444">加载失败</div>'}
+  }catch(e){$('tabPolls').innerHTML='<div class="text-xs text-center" style="padding:40px;color:#ff4444">加载失败<br><span style="font-size:11px;margin-top:8px;display:block">'+e.message.slice(0,50)+'</span></div>'}
 }
 
 // ============ 投票详情 ============
@@ -655,7 +655,7 @@ async function showPoll(pid){
     };
     const ta = document.getElementById('shareText_'+pid);
     if(ta) ta.value = presets['中文'];
-  }catch(e){$('pollDetail').innerHTML=`<button class="back-btn" onclick="location.href='/'">← 返回</button><div class="text-xs text-center" style="padding:40px;color:#ff4444">加载失败</div>`}
+  }catch(e){var em=e&&e.message?e.message.slice(0,55):'?';$('pollDetail').innerHTML='<button class="back-btn" onclick="location.href=\'/\'">← 返回</button><div class="text-xs text-center" style="padding:40px;color:#ff4444">加载失败</div><div class="text-xs text-center" style="padding:4px;color:#ffa500;font-size:11px">错误:'+em+'</div>'}
 }
 
 // ============ 分享工具 ============
