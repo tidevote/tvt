@@ -1021,7 +1021,44 @@ async function loadMe(){
 }
 
 
+// ============ 多语言 ============
+// 自动检测系统语言
+var currentLang = (navigator.language||navigator.userLanguage||'').startsWith('en') ? 'en' : 'zh';
+const LANG = {
+  tabHome: {zh:'🏠 首页', en:'🏠 Home'},
+  tabPolls: {zh:'🗳 投票', en:'🗳 Polls'},
+  tabCreate: {zh:'✏️ 创建', en:'✏️ Create'},
+  tabFaucet: {zh:'🚰 免费领币', en:'🚰 Free Tokens'},
+  tabCheckin: {zh:'📅 签到', en:'📅 Check-in'},
+  tabMe: {zh:'👤 我的', en:'👤 Me'},
+  connectWallet: {zh:'🔗 连接钱包', en:'🔗 Connect Wallet'},
+  checkinBtn: {zh:'🔥 签到领奖励', en:'🔥 Check-in'},
+  checkinSuccess: {zh:'✅ 签到成功！', en:'✅ Check-in success!'},
+  checkinError: {zh:'今天已签到过了，明天再来吧 📅', en:'Already checked in today 📅'},
+  noWallet: {zh:'请先连接钱包', en:'Please connect wallet'},
+  loadingFail: {zh:'加载失败', en:'Load failed'},
+  loadingFailNetwork: {zh:'加载失败，请检查网络', en:'Please check your network'},
+};
+
+function t(key){ return LANG[key] ? (LANG[key][currentLang]||LANG[key]['zh']) : key; }
+
+function toggleLang(){
+  currentLang = (currentLang === 'zh') ? 'en' : 'zh';
+  document.getElementById('langBtn').textContent = currentLang === 'zh' ? '🌐 EN' : '🌐 中';
+  refreshUILang();
+}
+function refreshUILang(){
+  document.getElementById('langBtn').textContent = currentLang === 'zh' ? '🌐 EN' : '🌐 中';
+  document.querySelectorAll('.tab').forEach(function(tab){
+    var k = tab.getAttribute('data-tab');
+    if(k){ var tk='tab'+k.charAt(0).toUpperCase()+k.slice(1); if(LANG[tk]) tab.textContent = LANG[tk][currentLang]; }
+  });
+}
+
 // ============ 初始化 ============
+// 根据系统语言刷新界面
+refreshUILang();
+
 // 检查 URL 参数
 const params=new URLSearchParams(location.search);
 if(params.get('poll')){
