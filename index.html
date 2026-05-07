@@ -805,6 +805,7 @@ async function loadCheckin(){
 }
 
 async function doCheckIn(){
+  alert('按钮被点击了！address='+(address?'有':'无')+' tv='+(tv?'有':'无'));
   if(!address||!tv){
     status('请先连接钱包','error');
     return;
