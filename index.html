@@ -756,6 +756,10 @@ async function doClaim(pid){
 
 // ============ 签到 ============
 async function loadCheckin(){
+  // 调试：检查按钮元素
+  var dbgBtn=document.getElementById('checkinBtn');
+  if(!dbgBtn){alert('❌ 找不到签到按钮');return;}
+  
   show('tabCheckin');
   $('checkinBtn').style.display='none';
   if(!address){$('streakNum').textContent='?';$('discountInfo').innerHTML='请先连接钱包';return}
