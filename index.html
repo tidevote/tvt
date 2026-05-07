@@ -99,16 +99,85 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
 
 <!-- Tabs -->
 <div class="tabs" id="tabBar">
+  <button class="tab" data-tab="home">🏠 首页</button>
   <button class="tab active" data-tab="polls">🗳 投票</button>
   <button class="tab" data-tab="create">✏️ 创建</button>
   <button class="tab" data-tab="faucet">🚰 免费领币</button>
   <button class="tab" data-tab="checkin">📅 签到</button>
   <button class="tab" data-tab="me">👤 我的</button>
-  <button class="tab" data-tab="admin">📊 数据</button>
 </div>
 
 <!-- Loading placeholder -->
 <div class="text-center text-xs" id="loadingMsg" style="padding:40px">加载中...</div>
+
+<!-- ====== 项目首页 ====== -->
+<div id="tabHome" class="hidden">
+  <div class="card" style="text-align:center;padding:24px 20px;background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(123,47,247,0.08));border-color:rgba(0,212,255,0.15)">
+    <div style="font-size:40px;margin-bottom:8px">🌊</div>
+    <div style="font-size:22px;font-weight:700;background:linear-gradient(135deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Tide Vote</div>
+    <div style="font-size:13px;color:#888;margin-top:4px">区块链投票平台 — 透明、公正、有趣</div>
+    <div style="font-size:12px;color:#666;margin-top:2px">Decentralized Voting — Transparent, Fair, Fun</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📖 什么是 TVT？</div>
+    <div style="font-size:13px;color:#aaa;line-height:1.8">
+      <b>TVT (Tide Vote Token)</b> 是基于 <b>Base 链</b>的娱乐投票生态代币。
+      <br><br>
+      在这里你可以：
+    </div>
+    <div style="margin-top:8px">
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+        <span style="font-size:20px">🗳️</span>
+        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">创建投票</div><div style="font-size:11px;color:#666">发起比赛、评选、决策，设置每票费用</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+        <span style="font-size:20px">🏆</span>
+        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">投票赢奖</div><div style="font-size:11px;color:#666">投票消耗 TVT 进入奖池，开奖随机赢奖金</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+        <span style="font-size:20px">🚰</span>
+        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">免费领币</div><div style="font-size:11px;color:#666">新用户免费领 10 TVT，零门槛参与</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+        <span style="font-size:20px">📅</span>
+        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">每日签到</div><div style="font-size:11px;color:#666">每天领 1 TVT，连续签到享投票折扣</div></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:20px">🤝</span>
+        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">邀请裂变</div><div style="font-size:11px;color:#666">邀请好友投票赚佣金，共建社区</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎯 快速开始</div>
+    <div style="font-size:13px;color:#aaa;line-height:1.8">
+      1. 🔗 <b>连接钱包</b> — 支持 MetaMask / OKX / imToken<br>
+      2. 🚰 点<b>「免费领币」</b>领 10 TVT<br>
+      3. 🗳️ 去<b>「投票」</b>参与或创建投票<br>
+      4. 📅 每天<b>「签到」</b>免费领 TVT<br>
+      5. 🤝 邀请好友一起玩
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 合约地址</div>
+    <div style="font-size:11px;color:#666;line-height:1.8">
+      TVT 代币:<br>
+      <code style="font-size:10px;color:#00d4ff;word-break:break-all">0xEBbcc7e0AC8bDec9903C72F60EBaA6169EfB2B72</code><br><br>
+      TideVote 投票:<br>
+      <code style="font-size:10px;color:#00d4ff;word-break:break-all">0x6b71557813c451dAE9F8519335af7BB44694E5Ac</code>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center;padding:16px">
+    <div style="font-size:11px;color:#555;line-height:1.6">
+      🌊 Tide Vote — Powered by Base<br>
+      数据全部上链，公开透明，不可篡改
+    </div>
+  </div>
+</div>
 
 <!-- ====== 投票列表 ====== -->
 <div id="tabPolls" class="hidden"></div>
@@ -213,29 +282,7 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
   </div>
 </div>
 
-<!-- ====== 管理数据 ====== -->
-<div id="tabAdmin" class="hidden">
-  <div class="card">
-    <div class="card-title">📊 TVT 概览</div>
-    <div style="font-size:13px;color:#aaa;line-height:1.8" id="adminTvtInfo">加载中...</div>
-  </div>
-  <div class="card">
-    <div class="card-title">🚰 水龙头数据</div>
-    <div style="font-size:13px;color:#aaa;line-height:1.8" id="adminFaucetInfo">加载中...</div>
-  </div>
-  <div class="card">
-    <div class="card-title">🗳 投票数据</div>
-    <div style="font-size:13px;color:#aaa;line-height:1.8" id="adminPollInfo">加载中...</div>
-  </div>
-  <div class="card">
-    <div class="card-title">🔍 查询地址</div>
-    <div style="display:flex;gap:4px">
-      <input type="text" id="adminSearchAddr" placeholder="输入钱包地址 0x..." style="flex:1">
-      <button class="copy-btn" onclick="adminSearchAddr()">查询</button>
-    </div>
-    <div style="font-size:12px;color:#aaa;margin-top:8px;line-height:1.6" id="adminSearchResult"></div>
-  </div>
-</div>
+
 
 <div class="status-bar" id="statusBar"></div>
 
@@ -291,14 +338,14 @@ document.querySelectorAll('.tab').forEach(tab=>{
   tab.onclick=()=>{
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
-    ['tabPolls','pollDetail','createPoll','tabFaucet','tabCheckin','tabMe','tabAdmin'].forEach(id=>hide(id));
+    ['tabHome','tabPolls','pollDetail','createPoll','tabFaucet','tabCheckin','tabMe'].forEach(id=>hide(id));
     currentTab = tab.dataset.tab;
+    if(currentTab==='home'){show('tabHome');}
     if(currentTab==='polls')loadPolls();
     if(currentTab==='create'){resetCreateForm();show('createPoll');}
     if(currentTab==='faucet')loadFaucet();
     if(currentTab==='checkin')loadCheckin();
     if(currentTab==='me')loadMe();
-    if(currentTab==='admin')loadAdmin();
   }
 });
 
@@ -934,262 +981,6 @@ async function loadMe(){
   }catch(e){}
 }
 
-
-// ============ 📊 管理数据 ============
-const OWNER_ADDR = "0x4E83CC45BC9f121f08D4cBd0558599cD2091d55a";
-
-async function loadAdmin(){
-  show('tabAdmin');
-  if(!address){$('adminTvtInfo').textContent='请先连接钱包';return;}
-  
-  // 检查是否是管理员
-  if(address.toLowerCase()!==OWNER_ADDR.toLowerCase()){
-    $('adminTvtInfo').textContent='⛔ 仅管理员可查看';
-    $('adminFaucetInfo').textContent='';
-    $('adminPollInfo').textContent='';
-    return;
-  }
-  
-  try{
-    const p=new ethers.JsonRpcProvider(getRpc());
-    const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
-    const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
-    const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
-    
-    // TVT 概览
-    const [totalSupply,ownerBal] = await Promise.all([
-      tvtRO.totalSupply(),
-      tvtRO.balanceOf(OWNER_ADDR)
-    ]);
-    $('adminTvtInfo').innerHTML=
-      `总供应量: ${ethers.formatEther(totalSupply)} TVT<br>`+
-      `Owner 余额: ${ethers.formatEther(ownerBal)} TVT<br>`+
-      `TVT 地址: <code style="font-size:10px">${TVT_ADDR}</code>`;
-    
-    // 水龙头
-    try{
-      const [claimed,amount,bal,remaining,totalC,isActive]=await Promise.all([
-        faucetRO.hasClaimed(address), // 只是占位
-        faucetRO.claimAmount(),
-        faucetRO.faucetBalance(),
-        faucetRO.remainingClaims(),
-        faucetRO.totalClaimed(),
-        faucetRO.active()
-      ]);
-      $('adminFaucetInfo').innerHTML=
-        `已领取人数: ${totalC} 人<br>`+
-        `池子余额: ${ethers.formatEther(bal)} TVT<br>`+
-        `每次领取: ${ethers.formatEther(amount)} TVT<br>`+
-        `剩余可领: ${remaining} 次<br>`+
-        `状态: ${isActive?'✅ 运行中':'⛔ 暂停'}`+
-        `<br>水龙头: <code style="font-size:10px">${FAUCET_ADDR}</code>`;
-    }catch(e){$('adminFaucetInfo').textContent='加载失败: '+e.message.slice(0,40);}
-    
-    // 投票数据
-    try{
-      const count=await tvRO.pollCount();
-      let totalVotes=0n, totalPrize=0n;
-      if(count>0n){
-        for(let i=0;i<Number(count);i++){
-          try{
-            const poll=await tvRO.getPoll(i);
-            totalPrize+=poll.totalPrizePool;
-            const opts=await tvRO.getPollOptions(i);
-            for(const v of opts.counts) totalVotes+=v;
-          }catch(e){}
-        }
-      }
-      $('adminPollInfo').innerHTML=
-        `总投票数: ${count}<br>`+
-        `总投票量: ${ethers.formatEther(totalVotes)} TVT<br>`+
-        `总奖池: ${ethers.formatEther(totalPrize)} TVT<br>`+
-        `投票合约: <code style="font-size:10px">${TV_ADDR}</code>`;
-    }catch(e){$('adminPollInfo').textContent='加载失败: '+e.message.slice(0,40);}
-    
-  }catch(e){$('adminTvtInfo').textContent='加载失败: '+e.message.slice(0,40);}
-}
-
-async function adminSearchAddr(){
-  const addr=$('adminSearchAddr').value.trim();
-  if(!addr||addr.length<10){status('请输入有效地址','error');return;}
-  const result=$('adminSearchResult');
-  result.textContent='查询中...';
-  try{
-    const p=new ethers.JsonRpcProvider(getRpc());
-    const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
-    const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
-    
-    const [bal,ci]=await Promise.all([
-      tvtRO.balanceOf(addr).catch(()=>'?'),
-      tvRO.getCheckInStatus(addr).catch(()=>['?','?'])
-    ]);
-    let html=`TVT 余额: ${typeof bal==='bigint'?ethers.formatEther(bal):'?'} TVT<br>`;
-    if(ci&&ci.length>1){
-      html+=`今日签到: ${ci[0]?'✅ 已签':'❌ 未签'}<br>`;
-      html+=`连续签到: ${ci[1]} 天`;
-    }
-    result.innerHTML=html;
-  }catch(e){result.textContent='查询失败: '+e.message.slice(0,40);}
-}
-
-
-
-// ============ 创建投票 ============
-let createOptions = [];
-
-function getDefaultEndTime(){
-  const d=new Date(Date.now()+24*3600000);
-  d.setMinutes(d.getMinutes()-d.getMinutes()%5);
-  const pad=n=>String(n).padStart(2,'0');
-  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
-}
-
-function initCreateForm(){
-  createOptions = [];
-  renderCreateOptions();
-}
-function addCreateOption(){
-  const input=document.getElementById('createNewOption');
-  const name=input.value.trim();
-  if(!name){status('请输入选项名称','error');return;}
-  if(createOptions.length>=10){status('最多10个选项','error');return;}
-  createOptions.push(name);
-  input.value='';
-  renderCreateOptions();
-}
-function removeCreateOption(idx){
-  createOptions.splice(idx,1);
-  renderCreateOptions();
-}
-function renderCreateOptions(){
-  const list=document.getElementById('createOptionsList');
-  list.innerHTML=createOptions.map((name,i)=>
-    '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:4px;border-radius:6px;background:rgba(255,255,255,0.04);font-size:13px">'+
-      '<span>'+(i+1)+'. '+name+'</span>'+
-      '<span style="cursor:pointer;color:#ff4444;font-size:16px" onclick="removeCreateOption('+i+')">✕</span>'+
-    '</div>'
-  ).join('');
-}
-function resetCreateForm(){
-  document.getElementById('createTitle').value='';
-  document.getElementById('createVoteCost').value='1';
-  document.getElementById('createEndTime').value=getDefaultEndTime();
-  document.getElementById('createNewOption').value='';
-  document.getElementById('createStatus').textContent='';
-  initCreateForm();
-}
-
-async function doCreatePoll(){
-  if(!address){status('请先连接钱包','error');return;}
-  
-  const title=document.getElementById('createTitle').value.trim();
-  if(!title){status('请输入投票标题','error');return;}
-  
-  if(createOptions.length<2){status('至少需要2个选项','error');return;}
-  
-  const voteCostStr=document.getElementById('createVoteCost').value;
-  const voteCost=ethers.parseEther(voteCostStr);
-  if(voteCost<=0n){status('请输入有效的投票费用','error');return;}
-  
-  const endTimeStr=document.getElementById('createEndTime').value;
-  if(!endTimeStr){status('请选择结束时间','error');return;}
-  const endMs=new Date(endTimeStr).getTime();
-  const nowMs=Date.now();
-  if(endMs<=nowMs){status('结束时间必须在当前时间之后','error');return;}
-  const diffHours=(endMs-nowMs)/3600000;
-  if(diffHours<1){status('投票至少持续1小时','error');return;}
-  if(diffHours>720){status('最长30天','error');return;}
-  const duration=Math.round(diffHours);
-  
-  const statusEl=document.getElementById('createStatus');
-  statusEl.textContent='⏳ 准备创建...';
-  
-  try{
-    // 检查 TVT 余额
-    const bal=await tvt.balanceOf(address);
-    const creationFee=ethers.parseEther('1'); // 1 TVT 创建费
-    const totalNeeded=creationFee+voteCost; // 至少要有创建费
-    if(bal<totalNeeded){
-      statusEl.innerHTML='<span style="color:#ff4444">❌ TVT 余额不足，需要至少 1 TVT 创建费</span>';
-      return;
-    }
-    
-    statusEl.textContent='⏳ 第一步：授权 TVT...';
-    let tx=await tvt.approve(TV_ADDR, creationFee*2n);
-    await tx.wait();
-    
-    statusEl.textContent='⏳ 第二步：创建投票...';
-    tx=await tv.createPollQuick(title, createOptions, voteCost, duration);
-    statusEl.textContent='⏳ 交易已发送，等待确认...';
-    await tx.wait();
-    
-    statusEl.innerHTML='<span style="color:#00d4ff">✅ 投票创建成功！</span>';
-    status('🎉 投票已创建！','success');
-    resetCreateForm();
-    
-    // 切换到投票列表
-    document.querySelectorAll('.tab')[0].click();
-    setTimeout(loadPolls, 1000);
-  }catch(e){
-    statusEl.innerHTML='<span style="color:#ff4444">❌ '+e.message.slice(0,60)+'</span>';
-  }
-}
-
-
-// ============ 多语言 ============
-let currentLang = 'zh';
-const LANG = {
-  tabPolls: {zh:'🗳 投票', en:'🗳 Polls'},
-  tabCreate: {zh:'✏️ 创建', en:'✏️ Create'},
-  tabFaucet: {zh:'🚰 免费领币', en:'🚰 Free Tokens'},
-  tabCheckin: {zh:'📅 签到', en:'📅 Check-in'},
-  tabMe: {zh:'👤 我的', en:'👤 Me'},
-  tabAdmin: {zh:'📊 数据', en:'📊 Data'},
-  connectWallet: {zh:'🔗 连接钱包', en:'🔗 Connect Wallet'},
-  loading: {zh:'加载中...', en:'Loading...'},
-  checkinBtn: {zh:'🔥 签到领奖励', en:'🔥 Check-in'},
-  checkinDone: {zh:'✅ 今日已签到', en:'✅ Checked in'},
-  checkinError: {zh:'今天已签到过了，明天再来吧 📅', en:'Already checked in today, come back tomorrow 📅'},
-  checkinSuccess: {zh:'✅ 签到成功！', en:'✅ Check-in success!'},
-  noWallet: {zh:'请先连接钱包', en:'Please connect wallet'},
-  claimBtn: {zh:'🚰 免费领取 TVT', en:'🚰 Claim Free TVT'},
-  claimDone: {zh:'✅ 你已经领取过了！', en:'✅ Already claimed!'},
-  vote: {zh:'🗳 投票', en:'🗳 Vote'},
-  freeClaim: {zh:'🚰 没有 TVT？免费领取 →', en:'🚰 No TVT? Claim free →'},
-  days_7: {zh:'还差 ', en:'Need '},
-  days_9: {zh:' 天到 9 折', en:' days for 10% off'},
-  days_8: {zh:' 天到 8 折', en:' days for 20% off'},
-  days_5: {zh:' 天到 5 折', en:' days for 50% off'},
-  maxDiscount: {zh:'🎉 5折满级', en:'🎉 Max 50% off'},
-  loadingFail: {zh:'加载失败', en:'Load failed'},
-  loadingFailNetwork: {zh:'加载失败，请检查网络', en:'Check your network connection'},
-  checkNet: {zh:'请检查网络', en:'Check network'},
-};
-
-function t(key){
-  var val = LANG[key];
-  return val ? (val[currentLang] || val['zh']) : key;
-}
-
-function toggleLang(){
-  currentLang = (currentLang === 'zh') ? 'en' : 'zh';
-  document.getElementById('langBtn').textContent = currentLang === 'zh' ? '🌐 EN' : '🌐 中';
-  // 刷新当前页面文本
-  refreshUILang();
-}
-function refreshUILang(){
-  // 更新标签
-  document.querySelectorAll('.tab').forEach(function(tab){
-    var key = tab.getAttribute('data-tab');
-    if(key){
-      var tKey = 'tab' + key.charAt(0).toUpperCase() + key.slice(1);
-      if(LANG[tKey]) tab.textContent = LANG[tKey][currentLang];
-    }
-  });
-  // 更新连接按钮
-  var cb = document.getElementById('connectBtn');
-  if(cb && !address) cb.textContent = t('connectWallet');
-}
 
 // ============ 初始化 ============
 // 检查 URL 参数
