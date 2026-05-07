@@ -313,16 +313,49 @@ function isMobile(){
   return /Mobi|Android|iPhone|iPod|iPad/i.test(navigator.userAgent);
 }
 
+// 智能打开钱包：先试 App → 不行就去商店 → 还不行就复制链接
+function smartOpenWallet(deeplink, downloadUrl){
+  const start = Date.now();
+  let appOpened = false;
+  
+  const onBlur = () => {
+    appOpened = true;
+    document.removeEventListener('visibilitychange', onBlur);
+    window.removeEventListener('pagehide', onBlur);
+  };
+  document.addEventListener('visibilitychange', onBlur);
+  window.addEventListener('pagehide', onBlur);
+  
+  // 尝试打开 App
+  window.location.href = deeplink;
+  
+  // 2秒后还没打开 → 去下载页
+  setTimeout(() => {
+    document.removeEventListener('visibilitychange', onBlur);
+    window.removeEventListener('pagehide', onBlur);
+    if(!appOpened){
+      const userWent = confirm('钱包 App 未检测到，要去下载页安装吗？\n\n点「确定」去下载页\n点「取消」复制链接自己打开');
+      if(userWent){
+        window.location.href = downloadUrl;
+      }else{
+        navigator.clipboard.writeText(location.href).then(()=>{
+          status('✅ 链接已复制，到钱包浏览器中粘贴打开','success');
+        });
+      }
+    }
+  }, 2000);
+}
+
 // 获取 MetaMask/OKX 手机 App 直达链接
 function getMobileWalletLink(){
   const url = encodeURIComponent(location.href);
   const hostPath = location.host + location.pathname + location.search;
   const encodedUrl = encodeURIComponent(location.href);
   return {
-    imtoken: 'imtokenv2://navigate/DApp?url=' + encodedUrl,
-    okx: 'okx://wallet/dapp/url?dappUrl=' + encodedUrl,
-    tp: 'tp://dapp?url=' + encodedUrl,
-    metamask: 'https://metamask.app.link/dapp/' + hostPath,
+    imtoken: { deeplink: 'imtokenv2://navigate/DApp?url=' + encodedUrl, download: 'https://token.im/download' },
+    okx: { deeplink: 'okx://wallet/dapp/url?dappUrl=' + encodedUrl, download: 'https://www.okx.com/download' },
+    tp: { deeplink: 'tp://dapp?url=' + encodedUrl, download: 'https://www.tokenpocket.pro/download' },
+    metamask: { deeplink: 'https://metamask.app.link/dapp/' + hostPath, download: 'https://metamask.io/download/' },
   };
 }
 
@@ -358,10 +391,10 @@ async function connect(){
       walletBtns.id='mobileWalletOptions';
       walletBtns.style.cssText='display:flex;gap:8px;margin-bottom:12px';
       walletBtns.innerHTML=
-        '<a href="'+links.imtoken+'" style="flex:1;padding:10px;border-radius:10px;background:#1a73e8;color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:600">🔷 imToken</a>'+
-        '<a href="'+links.okx+'" style="flex:1;padding:10px;border-radius:10px;background:#121212;color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:600">⭕ OKX</a>'+
-        '<a href="'+links.tp+'" style="flex:1;padding:10px;border-radius:10px;background:#1b9c5e;color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:600">🟢 TP</a>'+
-        '<a href="'+links.metamask+'" style="flex:1;padding:10px;border-radius:10px;background:#f6851b;color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:600">🦊 MetaMask</a>';
+        '<button onclick="smartOpenWallet(links.imtoken.deeplink,links.imtoken.download)" style="flex:1;padding:10px;border-radius:10px;background:#1a73e8;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">🔷 imToken</button>'+
+        '<button onclick="smartOpenWallet(links.okx.deeplink,links.okx.download)" style="flex:1;padding:10px;border-radius:10px;background:#121212;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">⭕ OKX</button>'+
+        '<button onclick="smartOpenWallet(links.tp.deeplink,links.tp.download)" style="flex:1;padding:10px;border-radius:10px;background:#1b9c5e;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">🟢 TP</button>'+
+        '<button onclick="smartOpenWallet(links.metamask.deeplink,links.metamask.download)" style="flex:1;padding:10px;border-radius:10px;background:#f6851b;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">🦊 MetaMask</button>';
       btn.parentNode.insertBefore(walletBtns, btn.nextSibling);
       
       status('💡 手机用户推荐用 imToken 或 OKX，国内用户首选','');
