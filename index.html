@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🌊 TVT - Tide Vote</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a1a;color:#e0e0e0;min-height:100vh}
+.container{max-width:480px;width:100%;margin:0 auto;padding:16px}
+.header{text-align:center;padding:20px 0 16px}
+.header h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{color:#888;font-size:13px;margin-top:2px}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:rgba(255,255,255,0.05);border-radius:12px;padding:4px}
+.tab{flex:1;padding:10px;text-align:center;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;color:#888;background:transparent;transition:all .2s}
+.tab.active{background:rgba(0,212,255,0.15);color:#00d4ff}
+.tab:hover{color:#e0e0e0}
+
+/* Card */
+.card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;margin-bottom:12px}
+.card-title{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+
+/* Connect Button */
+.connect-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;transition:all .2s;margin-bottom:12px}
+
+/* Poll Card */
+.poll-card{display:block;padding:16px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:10px;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit}
+.poll-card:hover{border-color:rgba(0,212,255,0.3);transform:translateY(-1px)}
+.poll-card .title{font-size:15px;font-weight:600;margin-bottom:4px}
+.poll-card .meta{font-size:12px;color:#666;display:flex;gap:8px;flex-wrap:wrap}
+.poll-card .tag{display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px}
+.tag.active{background:rgba(0,212,255,0.15);color:#00d4ff}
+.tag.ended{background:rgba(255,255,255,0.08);color:#888}
+.tag.upcoming{background:rgba(123,47,247,0.15);color:#b388ff}
+
+/* Poll Detail */
+.option-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:all .2s;color:#e0e0e0;font-size:15px;margin-bottom:8px}
+.option-btn:hover{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)}
+.option-btn .votes{color:#666;font-size:13px}
+.option-btn.selected{border-color:#00d4ff;background:rgba(0,212,255,0.1)}
+
+/* Form */
+input,select,textarea{width:100%;padding:12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:14px;margin-bottom:8px;outline:none}
+input:focus{border-color:#00d4ff}
+label{font-size:12px;color:#888;display:block;margin-bottom:4px}
+.submit-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;transition:all .2s;margin-top:8px}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Status */
+.status-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 16px;font-size:13px;text-align:center;display:none;z-index:100;backdrop-filter:blur(10px);white-space:nowrap}
+.status-bar.show{display:block}
+.status-bar.success{border-color:#00d4ff;color:#00d4ff}
+.status-bar.error{border-color:#ff4444;color:#ff4444}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.1);border-top-color:#00d4ff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.back-btn{display:inline-block;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);color:#888;font-size:13px;cursor:pointer;margin-bottom:12px;background:transparent}
+
+/* Mobile share tips */
+.share-tip{background:rgba(123,47,247,0.1);border:1px solid rgba(123,47,247,0.2);border-radius:12px;padding:12px;font-size:12px;color:#b388ff;margin-bottom:12px;text-align:center}
+.share-tip code{font-size:11px;color:#00d4ff}
+
+/* Copy button */
+.copy-btn{padding:6px 12px;border-radius:6px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.1);color:#00d4ff;font-size:12px;cursor:pointer}
+
+/* Badge display inline */
+.badge-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.mini-badge{padding:2px 6px;border-radius:4px;font-size:10px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:#00d4ff}
+
+.hidden{display:none!important}
+.text-center{text-align:center}
+.mt-8{margin-top:8px}
+.gap-4{gap:4px}
+.flex{display:flex}
+.flex-col{flex-direction:column}
+.flex-1{flex:1}
+.justify-between{justify-content:space-between}
+.items-center{align-items:center}
+.text-xs{font-size:12px;color:#666}
+.text-sm{font-size:13px}
+</style>
+</head>
+<body>
+<div class="container" id="app">
+
+<div class="header">
+  <h1>🌊 TVT</h1>
+  <p>Tide Vote — 娱乐投票平台</p>
+</div>
+
+<button class="connect-btn" id="connectBtn">🔗 连接钱包</button>
+
+<!-- Tabs -->
+<div class="tabs" id="tabBar">
+  <button class="tab active" data-tab="polls">🗳 投票</button>
+  <button class="tab" data-tab="faucet">🚰 免费领币</button>
+  <button class="tab" data-tab="checkin">📅 签到</button>
+  <button class="tab" data-tab="me">👤 我的</button>
+</div>
+
+<!-- Loading placeholder -->
+<div class="text-center text-xs" id="loadingMsg" style="padding:40px">加载中...</div>
+
+<!-- ====== 投票列表 ====== -->
+<div id="tabPolls" class="hidden"></div>
+
+<!-- ====== 投票详情 ====== -->
+<div id="pollDetail" class="hidden"></div>
+
+<!-- ====== 创建投票 ====== -->
+<div id="createPoll" class="hidden"></div>
+
+<!-- ====== 免费领币 ====== -->
+<div id="tabFaucet" class="hidden">
+  <div class="card">
+    <div class="card-title" style="font-size:13px;color:#00d4ff">🚰 免费领取 TVT</div>
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:40px;margin-bottom:8px">🚰</div>
+      <div style="font-size:14px;color:#888;margin-bottom:4px">每个地址可免费领取一次</div>
+      <div style="font-size:12px;color:#666" id="faucetInfo">加载中...</div>
+    </div>
+    <button class="submit-btn" id="faucetClaimBtn" style="display:none;background:linear-gradient(135deg,#00d4ff,#7b2ff7)">🚰 免费领取 TVT</button>
+    <div style="text-align:center;padding:8px;font-size:12px;color:#888" id="faucetStatus"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 水龙头状态</div>
+    <div style="font-size:13px;color:#aaa;line-height:1.8" id="faucetStats">
+      池子余额: 加载中...<br>
+      已领取人数: 加载中...<br>
+      剩余可领次数: 加载中...<br>
+    </div>
+  </div>
+  <div class="share-tip">
+    📤 邀请好友专属链接:<br>
+    <code style="font-size:12px" id="faucetShareLink">加载中...</code>
+    <button class="copy-btn" onclick="copyFaucetLink()">复制</button>
+  </div>
+</div>
+
+<!-- ====== 签到 ====== -->
+<div id="tabCheckin" class="hidden">
+  <div class="card">
+    <div class="card-title">📅 每日签到</div>
+    <div style="text-align:center;padding:12px 0"><span id="streakNum" style="font-size:48px;font-weight:800;background:linear-gradient(135deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">0</span><div style="font-size:13px;color:#888;margin-top:2px">连续签到天数</div></div>
+    <button class="connect-btn" id="checkinBtn" style="display:none">🔥 签到</button>
+  </div>
+  <div class="card" id="discountSection">
+    <div class="card-title">💎 投票折扣</div>
+    <div class="text-sm" id="discountInfo">加载中...</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🏅 成就徽章</div>
+    <div class="badge-row" id="badgeList"></div>
+  </div>
+</div>
+
+<!-- ====== 我的 ====== -->
+<div id="tabMe" class="hidden">
+  <div class="card">
+    <div class="card-title">👤 账户</div>
+    <div class="text-sm" id="accountInfo">未连接</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🤝 邀请裂变</div>
+    <div class="text-sm" id="referralInfo">加载中...</div>
+  </div>
+</div>
+
+</div>
+
+<div class="status-bar" id="statusBar"></div>
+
+<script>
+// ============ 合约地址 ============
+const TVT_ADDR = "0xEBbcc7e0AC8bDec9903C72F60EBaA6169EfB2B72";
+const TV_ADDR  = "0x6b71557813c451dAE9F8519335af7BB44694E5Ac";
+const BADGE_ADDR = "0xfFedbDcA61253AF32B389C40Ed3894B605EF428b";
+const FAUCET_ADDR = "0xFA99D22B14A4e2F95ba96ff0900767Ab8bc24bbF"; // 🚰 TideVoteFaucet
+
+const TV_ABI = [
+  "function pollCount() view returns (uint256)",
+  "function getPoll(uint256) view returns (string title, address creator, uint256 startTime, uint256 endTime, uint256 voteCost, bool finalized, uint256 totalPrizePool, uint16 commissionBP, bool drawn, uint8 status)",
+  "function getPollOptions(uint256) view returns (string[] names, uint256[] counts)",
+  "function createPollQuick(string,string[],uint256,uint256) returns (uint256)",
+  "function vote(uint256,uint256,uint256)",
+  "function finalizeAndDraw(uint256)",
+  "function claimReward(uint256)",
+  "function getCheckInStatus(address) view returns (bool,uint256)",
+  "function checkIn()",
+  "function getVoteDiscountBP(address) view returns (uint256)",
+  "function getVoterInfo(uint256,address) view returns (bool,uint256)",
+  "function getWinners(uint256) view returns (address[])",
+  "function getWinnerReward(uint256,address) view returns (uint256)",
+  "function getReferralInfo(address) view returns (address,uint256,uint256,bool)"
+];
+const TVT_ABI = ["function balanceOf(address) view returns (uint256)", "function approve(address,uint256)", "function decimals() view returns (uint8)"];
+const BADGE_ABI = ["function balanceOf(address,uint256) view returns (uint256)", "function badgeInfo(uint256) view returns (string,string,string)"];
+const FAUCET_ABI = [
+  "function claim()",
+  "function hasClaimed(address) view returns (bool)",
+  "function claimAmount() view returns (uint256)",
+  "function faucetBalance() view returns (uint256)",
+  "function remainingClaims() view returns (uint256)",
+  "function active() view returns (bool)",
+  "function totalClaimed() view returns (uint256)",
+  "function getClaimStatus(address[]) view returns (bool[])"
+];
+
+let provider, signer, address, tv, tvt, badgeC, faucet;
+let currentTab = "polls";
+
+// ============ 工具 ============
+function $(id){return document.getElementById(id)}
+function show(id){const e=$(id);if(e)e.classList.remove('hidden')}
+function hide(id){const e=$(id);if(e)e.classList.add('hidden')}
+function timeAgo(t){const d=Date.now()/1000-t;if(d<60)return'刚刚';if(d<3600)return Math.floor(d/60)+'分钟前';if(d<86400)return Math.floor(d/3600)+'小时前';return Math.floor(d/86400)+'天前'}
+function tsToStr(t){const d=new Date(t*1000);return d.getMonth()+1+'月'+d.getDate()+'日 '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
+let st;function status(m,t){const b=$('statusBar');b.innerHTML=m;b.className='status-bar show'+(t?' '+t:'');clearTimeout(st);if(t)st=setTimeout(()=>b.classList.remove('show'),5000)}
+
+// ============ 标签切换 ============
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    ['tabPolls','pollDetail','createPoll','tabFaucet','tabCheckin','tabMe'].forEach(id=>hide(id));
+    currentTab = tab.dataset.tab;
+    if(currentTab==='polls')loadPolls();
+    if(currentTab==='faucet')loadFaucet();
+    if(currentTab==='checkin')loadCheckin();
+    if(currentTab==='me')loadMe();
+  }
+});
+
+// ============ 连接钱包 ============
+async function connect(){
+  if(!window.ethereum){status('请安装 MetaMask 或 OKX Wallet','error');return}
+  try{
+    provider=new ethers.BrowserProvider(window.ethereum);
+    signer=await provider.getSigner();address=await signer.getAddress();
+    const net=await provider.getNetwork();
+    if(net.chainId!==8453n){status('⚠️ 请切换到 Base 主网','error');return}
+    tv=new ethers.Contract(TV_ADDR,TV_ABI,signer);
+    tvt=new ethers.Contract(TVT_ADDR,TVT_ABI,signer);
+    badgeC=new ethers.Contract(BADGE_ADDR,BADGE_ABI,provider);
+    faucet=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,signer);
+    $('connectBtn').textContent='✅ '+address.slice(0,6)+'...'+address.slice(-4);
+    $('loadingMsg').classList.add('hidden');
+    // 检查 URL 参数
+    const params=new URLSearchParams(location.search);
+    if(params.get('poll'))showPoll(params.get('poll'));
+    else loadPolls();
+    
+    // ?claim=1 → 显示领币提示
+    if(params.get('claim')){
+      setTimeout(()=>{
+        status('💡 没有 TVT 投票？点击 "免费领币" 标签领取 🚰','');
+      },3000);
+    }
+  }catch(e){status('连接失败','error')}
+}
+$('connectBtn').onclick=connect;
+
+// ============ 投票列表 ============
+async function loadPolls(){
+  show('tabPolls');$('tabPolls').innerHTML='<div class="text-xs text-center" style="padding:20px">加载投票列表...</div>';
+  try{
+    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
+    const count=await tvRO.pollCount();
+    if(count===0n){$('tabPolls').innerHTML='<div class="text-xs text-center" style="padding:40px;color:#666">暂无投票<br><br>📌 管理员可以创建第一个投票</div>';return}
+    
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:13px;color:#888">共 '+count+' 个投票</span></div>';
+    for(let i=Number(count)-1;i>=0;i--){
+      try{
+        const poll=await tvRO.getPoll(i);
+        const opt=await tvRO.getPollOptions(i);
+        const statuses=['📅 即将开始','🗳 投票中','⏰ 已结束'];
+        const statusClass=['upcoming','active','ended'][poll.status];
+        const tag=statuses[poll.status]+(poll.finalized?' ✅ 已结算':'');
+        html+=`<a class="poll-card" href="?poll=${i}">
+          <div class="title">${poll.title}</div>
+          <div class="meta"><span class="tag ${statusClass}">${tag}</span><span>💰 ${ethers.formatEther(poll.totalPrizePool)} TVT</span></div>
+          <div class="meta" style="margin-top:4px">${opt.names.join(' · ')}</div>
+        </a>`;
+      }catch(e){}
+    }
+    $('tabPolls').innerHTML=html;
+  }catch(e){$('tabPolls').innerHTML='<div class="text-xs text-center" style="padding:40px;color:#ff4444">加载失败</div>'}
+}
+
+// ============ 投票详情 ============
+async function showPoll(pid){
+  if(typeof pid==='string')pid=parseInt(pid);
+  hide('tabPolls');hide('tabCheckin');hide('tabMe');show('pollDetail');
+  $('pollDetail').innerHTML='<div class="text-xs text-center" style="padding:20px">加载投票详情...</div>';
+  
+  try{
+    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
+    const poll=await tvRO.getPoll(pid);
+    const opt=await tvRO.getPollOptions(pid);
+    
+    let voted='';
+    if(address)try{const vi=await tvRO.getVoterInfo(pid,address);voted=vi.participated?' ('+vi.totalVotes+'票)':'';}catch(e){}
+    
+    const statuses=['📅 即将开始','🗳 投票中','⏰ 已结束'];
+    const statusTag=statuses[poll.status];
+    
+    let winnersHtml='';
+    if(poll.drawn||poll.status===2){
+      try{
+        const w=await tvRO.getWinners(pid);
+        if(w&&w.length>0){
+          winnersHtml='<div class="card"><div class="card-title">🏆 中奖者</div>';
+          for(const ww of w){
+            const r=await tvRO.getWinnerReward(pid,ww);
+            if(r>0n)winnersHtml+=`<div class="text-xs" style="margin-bottom:4px">${ww.slice(0,6)}...${ww.slice(-4)} — ${ethers.formatEther(r)} TVT</div>`;
+          }
+          winnersHtml+='</div>';
+        }
+      }catch(e){}
+    }
+
+    let html=`<button class="back-btn" onclick="location.href='/'">← 返回</button>
+      <div class="card">
+        <div class="card-title">${statusTag}</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:6px">${poll.title}</div>
+        <div class="text-xs" style="color:#666">
+          创建者: ${poll.creator.slice(0,8)}... | 
+          ${tsToStr(Number(poll.startTime))} - ${tsToStr(Number(poll.endTime))} |
+          💰 ${ethers.formatEther(poll.totalPrizePool)} TVT</div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">🗳 投票选项</div>`;
+    
+    for(let i=0;i<opt.names.length;i++){
+      const voteCount=ethers.formatEther(opt.counts[i]);
+      const disabled=poll.status!==1||poll.finalized?'style="opacity:.5"':'';
+      html+=`<button class="option-btn" onclick="doVote(${pid},${i})" ${disabled}>
+        <span>${opt.names[i]}</span>
+        <span class="votes">${voteCount} TVT</span>
+      </button>`;
+    }
+    
+    html+=`<div style="margin-top:8px">
+      <div style="display:flex;gap:4px">
+        <input type="number" id="voteTimes" value="1" min="1" style="flex:1;text-align:center">
+        <span class="text-xs" style="padding:12px 0;color:#888">× ${ethers.formatEther(poll.voteCost)} TVT/票</span>
+      </div>
+    </div>
+    
+    <div style="margin-top:4px;text-align:center">
+      <a href="/?poll=${pid}&claim=1" style="display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border-radius:8px;background:rgba(0,212,255,0.08);border:1px dashed rgba(0,212,255,0.3);color:#00d4ff;font-size:12px;text-decoration:none;transition:all .2s"
+         onmouseover="this.style.background='rgba(0,212,255,0.15)'" onmouseout="this.style.background='rgba(0,212,255,0.08)'">
+        🚰 没有 TVT？免费领取 →
+      </a>
+    </div>`;
+
+    // 管理员按钮
+    if(address&&(poll.creator.toLowerCase()===address.toLowerCase()||true)){
+      if(!poll.finalized&&poll.status===1){
+        html+=`<button class="submit-btn" onclick="doFinalize(${pid})">🎯 结算 + 开奖</button>`;
+      }
+    }
+    
+    // 领奖
+    if(poll.drawn){
+      html+=`<button class="submit-btn" style="margin-top:8px;background:rgba(0,212,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.3)" onclick="doClaim(${pid})">🏆 领奖</button>`;
+    }
+    
+    html+=`</div>`;
+    html+=winnersHtml;
+
+    // ====== 分享生成器 ======
+    const shareUrl = location.origin+'/?poll='+pid+'&claim=1';
+    const shareText = encodeURIComponent('🗳️ 来投票吧！免费领 TVT → 来投一票！');
+    html+=`<div class="card" style="background:rgba(123,47,247,0.05);border-color:rgba(123,47,247,0.15)">
+      <div class="card-title">📤 分享生成器 <span style="color:#00d4ff;font-size:10px">含免费领币链接</span></div>
+      
+      <div style="margin-bottom:8px">
+        <label>🔗 推广链接（带免费领币）</label>
+        <div style="display:flex;gap:4px">
+          <input type="text" id="shareLink_${pid}" value="${shareUrl}" readonly style="flex:1;font-size:11px;padding:8px">
+          <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('shareLink_${pid}').value);status('✅ 链接已复制','success')">复制</button>
+        </div>
+      </div>
+      
+      <div style="margin-bottom:8px">
+        <label>💬 推荐文案（一键发送）</label>
+        <div id="sharePresets_${pid}">
+          <div style="display:flex;gap:4px;margin-bottom:4px">
+            <button style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(0,212,255,0.2);background:rgba(0,212,255,0.05);color:#aaa;font-size:11px;cursor:pointer"
+              onclick="copySharePreset(${pid},'中文')">📋 中文</button>
+            <button style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(0,212,255,0.2);background:rgba(0,212,255,0.05);color:#aaa;font-size:11px;cursor:pointer"
+              onclick="copySharePreset(${pid},'English')">📋 English</button>
+            <button style="flex:1;padding:6px;border-radius:6px;border:1px solid rgba(0,212,255,0.2);background:rgba(0,212,255,0.05);color:#aaa;font-size:11px;cursor:pointer"
+              onclick="copySharePreset(${pid},'简短')">📋 简短</button>
+          </div>
+          <textarea id="shareText_${pid}" rows="3" style="font-size:11px;padding:8px;resize:vertical" readonly></textarea>
+          <button class="copy-btn" style="margin-top:4px;width:100%" onclick="copyShareText(${pid})">📋 复制文案 + 链接</button>
+        </div>
+      </div>
+      
+      <div>
+        <label>📱 社交平台直达</label>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <a href="https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}" target="_blank" style="flex:1;padding:6px;border-radius:6px;background:#1da1f2;color:#fff;font-size:11px;text-align:center;text-decoration:none">🐦 Twitter</a>
+          <a href="https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}" target="_blank" style="flex:1;padding:6px;border-radius:6px;background:#0088cc;color:#fff;font-size:11px;text-align:center;text-decoration:none">✈️ Telegram</a>
+          <button onclick="navigator.clipboard.writeText('${shareUrl}');status('✅ 已复制，去微信群粘贴！','success')" style="flex:1;padding:6px;border-radius:6px;background:rgba(7,193,96,0.2);border:1px solid rgba(7,193,96,0.3);color:#07c160;font-size:11px;cursor:pointer">💚 微信</button>
+        </div>
+      </div>
+    </div>`;
+    
+    $('pollDetail').innerHTML=html;
+    // 设置默认分享文案
+    // 共享 shareUrl（已在上面定义）
+    const presets = {
+      '中文': `🗳️ 来投票了！每票都有机会赢奖\n🚰 新用户免费领 10 TVT，零门槛参与！\n👇 点这里：${shareUrl}`,
+      'English': `🗳️ Vote now! Win prizes with every vote\n🚰 New users get 10 FREE TVT to start!\n👇 Click here：${shareUrl}`,
+      '简短': `🗳️ 投票赢奖！免费领 TVT → ${shareUrl}`
+    };
+    const ta = document.getElementById('shareText_'+pid);
+    if(ta) ta.value = presets['中文'];
+  }catch(e){$('pollDetail').innerHTML=`<button class="back-btn" onclick="location.href='/'">← 返回</button><div class="text-xs text-center" style="padding:40px;color:#ff4444">加载失败</div>`}
+}
+
+// ============ 分享工具 ============
+function copySharePreset(pid, lang) {
+  const shareUrl = location.origin+'/?poll='+pid+'&claim=1';
+  const p2 = {
+    '中文': `🗳️ 来投票了！每票都有机会赢奖\n🚰 新用户免费领 10 TVT，零门槛参与！\n👇 点这里：${shareUrl}`,
+    'English': `🗳️ Vote now! Win prizes with every vote\n🚰 New users get 10 FREE TVT to start!\n👇 Click here：${shareUrl}`,
+    '简短': `🗳️ 投票赢奖！免费领 TVT → ${shareUrl}`
+  };
+  const ta2 = document.getElementById('shareText_'+pid);
+  if(ta2) ta2.value = p2[lang] || p2['中文'];
+}
+function copyShareText(pid) {
+  const ta3 = document.getElementById('shareText_'+pid);
+  if(ta3) { navigator.clipboard.writeText(ta3.value); status('✅ 文案+链接已复制！去粘贴分享吧','success'); }
+}
+
+// ============ 投票 ============
+async function doVote(pid,oi){
+  if(!address){status('请先连接钱包','error');return}
+  const times=parseInt($('voteTimes')?.value||1);
+  if(times<1){status('至少投1票','error');return}
+  try{
+    status('⏳ 请先在钱包确认...','');
+    let tx;
+    try{
+      tx=await tv.vote(pid,oi,times);
+    }catch(e){
+      if(e.message?.includes('exceeds allowance')||e.message?.includes('ERC20InsufficientAllowance')){
+        status('⏳ 先授权 TVT...','');
+        const poll=await tv.getPoll(pid);
+        const cost=poll.voteCost*BigInt(times)*2n;
+        tx=await tvt.approve(TV_ADDR,cost);await tx.wait();
+        status('✅ 授权成功，投票中...','');
+        tx=await tv.vote(pid,oi,times);
+      }else{throw e}
+    }
+    await tx.wait();
+    status(`✅ 投票成功！${times} 票已投给选项 ${oi}`,'success');
+    showPoll(pid);
+  }catch(e){status('❌ '+e.message.slice(0,60),'error')}
+}
+
+async function doFinalize(pid){
+  if(!address){status('请连接钱包','error');return}
+  try{
+    status('⏳ 结算中...','');const tx=await tv.finalizeAndDraw(pid);await tx.wait();
+    status('🎉 结算+开奖完成！','success');showPoll(pid);
+  }catch(e){status('❌ '+e.message.slice(0,60),'error')}
+}
+
+async function doClaim(pid){
+  if(!address){status('请连接钱包','error');return}
+  try{
+    status('⏳ 领取中...','');const tx=await tv.claimReward(pid);await tx.wait();
+    status('✅ 领奖成功！','success');showPoll(pid);
+  }catch(e){status('❌ '+e.message.slice(0,60),'error')}
+}
+
+// ============ 签到 ============
+async function loadCheckin(){
+  show('tabCheckin');
+  if(!address){$('checkinBtn').style.display='none';$('streakNum').textContent='?';return}
+  $('checkinBtn').style.display='block';
+  try{
+    const [ci,streak]=await tv.getCheckInStatus(address);
+    const discount=await tv.getVoteDiscountBP(address);
+    $('streakNum').textContent=streak.toString();
+    $('discountInfo').innerHTML=`当前折扣: ${discount/100}% ${discount>=5000?'🎉':''}<br>
+      ${streak<7?`还差 ${7-streak} 天到 9 折`:streak<14?`还差 ${14-streak} 天到 8 折`:streak<30?`还差 ${30-streak} 天到 5 折`:'🎉 5折满级'}`;
+    
+    const btn=$('checkinBtn');
+    if(ci){btn.textContent='✅ 今日已签到';btn.disabled=true;btn.style.background='rgba(0,212,255,.1)';}
+    else{btn.textContent='🔥 签到领奖励';btn.disabled=false;btn.removeAttribute('style');btn.onclick=doCheckIn;}
+    
+    // 徽章
+    if(badgeC){
+      const badges=[
+        [1,'🗳️','First Vote'],[2,'📅','Week Str'],[3,'📅','Month Str'],
+        [4,'💪','Vote 100'],[5,'🔥','Vote 500'],[6,'👑','Vote 1000'],
+        [7,'🍀','Lucky Win'],[8,'⚡','Season Act']
+      ];
+      let bhtml='';
+      for(const [id,icon,name] of badges){
+        try{
+          const bal=await badgeC.balanceOf(address,id);
+          if(bal>0n)bhtml+=`<span class="mini-badge">${icon} ${name}</span>`;
+        }catch(e){}
+      }
+      $('badgeList').innerHTML=bhtml||'<span class="text-xs" style="color:#666">暂无徽章，多投票吧！</span>';
+    }
+  }catch(e){}
+}
+
+async function doCheckIn(){
+  try{status('⏳ 签到中...','');const tx=await tv.checkIn();await tx.wait();status('✅ 签到成功！','success');loadCheckin();}
+  catch(e){status('❌ '+e.message.slice(0,60),'error')}
+}
+
+// ============ 🚰 免费领币 ============
+
+function copyFaucetLink(){
+  const base = location.origin+'/?poll=&claim=1';
+  navigator.clipboard.writeText(base);
+  status('✅ 邀请链接已复制！','success');
+}
+
+async function loadFaucet(){
+  show('tabFaucet');
+  const info=$('faucetInfo');
+  const btn=$('faucetClaimBtn');
+  const stats=$('faucetStats');
+  const shareLink=$('faucetShareLink');
+  
+  if(!address){
+    info.textContent='请先连接钱包';
+    btn.style.display='none';
+    stats.innerHTML='连接钱包后查看水龙头状态';
+    shareLink.textContent=location.origin+'/?poll=&claim=1';
+    return;
+  }
+  
+  try{
+    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
+    
+    const [claimed,amount,bal,remaining,totalC,isActive]=await Promise.all([
+      faucetRO.hasClaimed(address),
+      faucetRO.claimAmount(),
+      faucetRO.faucetBalance(),
+      faucetRO.remainingClaims(),
+      faucetRO.totalClaimed(),
+      faucetRO.active()
+    ]);
+    
+    if(FAUCET_ADDR==='0x0000000000000000000000000000000000000000'){
+      info.textContent='⏳ 水龙头合约尚未部署，请联系管理员';
+      btn.style.display='none';
+      stats.innerHTML='水龙头合约待部署...';
+      shareLink.textContent='等待部署...';
+      return;
+    }
+    
+    const amtStr=ethers.formatEther(amount);
+    const balStr=ethers.formatEther(bal);
+    
+    stats.innerHTML=`
+      池子余额: ${balStr} TVT<br>
+      每次领取: ${amtStr} TVT/人<br>
+      已领取: ${totalC} 人<br>
+      剩余可领: ${remaining} 次<br>
+      状态: ${isActive?'✅ 运行中':'⛔ 暂停'}
+    `;
+    
+    shareLink.textContent=location.origin+'/?poll=&claim=1';
+    
+    if(!isActive){
+      info.textContent='⛔ 水龙头目前暂停';
+      btn.style.display='none';
+    }else if(claimed){
+      info.textContent='✅ 你已经领取过了！快去投票吧 🗳️';
+      btn.style.display='none';
+    }else if(remaining===0n||bal<amount){
+      info.textContent='😅 池子空了，等管理员补充吧';
+      btn.style.display='none';
+    }else{
+      info.textContent=`🎉 点击下方按钮免费领取 ${amtStr} TVT （足够投票）`;
+      btn.style.display='block';
+      btn.textContent=`🚰 免费领取 ${amtStr} TVT`;
+      btn.onclick=doClaimFaucet;
+    }
+  }catch(e){
+    info.textContent='加载失败: '+e.message.slice(0,40);
+    btn.style.display='none';
+    stats.innerHTML='加载失败...';
+  }
+}
+
+async function doClaimFaucet(){
+  if(!address){status('请先连接钱包','error');return}
+  try{
+    status('⏳ 领取中，请确认钱包...','');
+    const tx=await faucet.claim();
+    await tx.wait();
+    status('🎉 领取成功！TVT 已到账，快去投票吧！','success');
+    loadFaucet();
+  }catch(e){
+    status('❌ '+e.message.slice(0,50),'error');
+  }
+}
+
+// ============ 我的 ============
+async function loadMe(){
+  show('tabMe');
+  if(!address){$('accountInfo').textContent='未连接钱包';$('referralInfo').textContent='';return}
+  try{
+    const bal=await tvt.balanceOf(address);
+    $('accountInfo').innerHTML=`地址: ${address.slice(0,10)}...${address.slice(-6)}<br>
+      TVT 余额: ${ethers.formatEther(bal)} TVT`;
+    try{
+      const ref=await tv.getReferralInfo(address);
+      $('referralInfo').innerHTML=`邀请人数: ${ref[2]}<br>邀请收益: ${ethers.formatEther(ref[1])} TVT`;
+    }catch(e){$('referralInfo').textContent='暂无邀请数据'}
+  }catch(e){}
+}
+
+// ============ 初始化 ============
+// 检查 URL 参数
+const params=new URLSearchParams(location.search);
+if(params.get('poll')){
+  $('tabBar').classList.add('hidden');
+  $('connectBtn').classList.add('hidden');
+  $('loadingMsg').classList.remove('hidden');
+  // 自动连接并加载
+  if(window.ethereum){
+    provider=new ethers.BrowserProvider(window.ethereum);
+    provider.getSigner().then(s=>{signer=s;address=s.address;tv=new ethers.Contract(TV_ADDR,TV_ABI,signer);showPoll(params.get('poll'))}).catch(()=>showPoll(params.get('poll')));
+  }else{showPoll(params.get('poll'))}
+  
+  // ?claim=1 → 底部提示领币
+  if(params.get('claim')){
+    setTimeout(()=>{
+      status('💡 还没 TVT？点 "没有 TVT？免费领取 →" 链接领取 🚰','');
+    },3000);
+  }
+}else{
+  if(window.ethereum){
+    window.ethereum.request({method:'eth_accounts'}).then(accs=>{if(accs.length>0)connect()});
+  }
+  $('loadingMsg').classList.add('hidden');
+  if(params.get('claim')){
+    // 只带了 ?claim=1，没有 poll → 引导连接钱包
+    $('loadingMsg').innerHTML='<div style="padding:40px"><div style="font-size:36px;margin-bottom:12px">🚰</div><div style="font-size:14px;color:#888;margin-bottom:8px">免费领 TVT</div><div class="text-xs" style="color:#666">请先连接钱包 → 点击上方 "免费领币" 标签领取</div></div>';
+  }else{
+    $('loadingMsg').classList.add('hidden');
+    loadPolls();
+  }
+}
+</script>
+</body>
+</html>
