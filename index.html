@@ -313,6 +313,20 @@ function isMobile(){
   return /Mobi|Android|iPhone|iPod|iPad/i.test(navigator.userAgent);
 }
 
+// 多 RPC 端点，国内可用
+const RPC_URLS = [
+  'https://base-rpc.publicnode.com',
+  'https://mainnet.base.org',
+  'https://base.drpc.org',
+  'https://1rpc.io/base'
+];
+let rpcIndex = 0;
+function getRpc(){
+  const url = RPC_URLS[rpcIndex % RPC_URLS.length];
+  rpcIndex++;
+  return url;
+}
+
 // 智能打开钱包：先试 App → 不行就去商店 → 还不行就复制链接
 function smartOpenWallet(deeplink, downloadUrl){
   if(!deeplink){ status('钱包链接无效','error'); return; }
@@ -453,7 +467,7 @@ $('connectBtn').onclick=connect;
 async function loadPolls(){
   show('tabPolls');$('tabPolls').innerHTML='<div class="text-xs text-center" style="padding:20px">加载投票列表...</div>';
   try{
-    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
+    const p=new ethers.JsonRpcProvider(getRpc());
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     const count=await tvRO.pollCount();
     if(count===0n){$('tabPolls').innerHTML='<div class="text-xs text-center" style="padding:40px;color:#666">暂无投票<br><br>📌 管理员可以创建第一个投票</div>';return}
@@ -484,7 +498,7 @@ async function showPoll(pid){
   $('pollDetail').innerHTML='<div class="text-xs text-center" style="padding:20px">加载投票详情...</div>';
   
   try{
-    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
+    const p=new ethers.JsonRpcProvider(getRpc());
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     const poll=await tvRO.getPoll(pid);
     const opt=await tvRO.getPollOptions(pid);
@@ -815,7 +829,7 @@ async function loadFaucet(){
   }
   
   try{
-    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
+    const p=new ethers.JsonRpcProvider(getRpc());
     const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
     
     const [claimed,amount,bal,remaining,totalC,isActive]=await Promise.all([
@@ -915,7 +929,7 @@ async function loadAdmin(){
   }
   
   try{
-    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
+    const p=new ethers.JsonRpcProvider(getRpc());
     const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
@@ -979,7 +993,7 @@ async function adminSearchAddr(){
   const result=$('adminSearchResult');
   result.textContent='查询中...';
   try{
-    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
+    const p=new ethers.JsonRpcProvider(getRpc());
     const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     
