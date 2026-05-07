@@ -315,33 +315,36 @@ function isMobile(){
 
 // 智能打开钱包：先试 App → 不行就去商店 → 还不行就复制链接
 function smartOpenWallet(deeplink, downloadUrl){
+  if(!deeplink){ status('钱包链接无效','error'); return; }
   const start = Date.now();
   let appOpened = false;
   
   const onBlur = () => {
     appOpened = true;
-    document.removeEventListener('visibilitychange', onBlur);
-    window.removeEventListener('pagehide', onBlur);
+    try{
+      document.removeEventListener('visibilitychange', onBlur);
+      window.removeEventListener('pagehide', onBlur);
+    }catch(e){}
   };
-  document.addEventListener('visibilitychange', onBlur);
-  window.addEventListener('pagehide', onBlur);
+  try{
+    document.addEventListener('visibilitychange', onBlur);
+    window.addEventListener('pagehide', onBlur);
+  }catch(e){}
   
   // 尝试打开 App
   window.location.href = deeplink;
   
   // 2秒后还没打开 → 去下载页
   setTimeout(() => {
-    document.removeEventListener('visibilitychange', onBlur);
-    window.removeEventListener('pagehide', onBlur);
+    try{
+      document.removeEventListener('visibilitychange', onBlur);
+      window.removeEventListener('pagehide', onBlur);
+    }catch(e){}
     if(!appOpened){
-      const userWent = confirm('钱包 App 未检测到，要去下载页安装吗？\n\n点「确定」去下载页\n点「取消」复制链接自己打开');
-      if(userWent){
-        window.location.href = downloadUrl;
-      }else{
-        navigator.clipboard.writeText(location.href).then(()=>{
-          status('✅ 链接已复制，到钱包浏览器中粘贴打开','success');
-        });
-      }
+      try{
+        navigator.clipboard.writeText(location.href);
+      }catch(e){}
+      status('⚠️ 未检测到钱包，链接已复制，请到钱包浏览器中粘贴打开','error');
     }
   }, 2000);
 }
@@ -387,14 +390,17 @@ async function connect(){
       btn.innerHTML='<div style="font-size:12px">📱 选择钱包打开</div>';
       
       // 在按钮下方添加钱包选项
+      // 用全局变量存钱包链接，避免onclick作用域问题
+      window._walletLinks = links;
       const walletBtns = document.createElement('div');
       walletBtns.id='mobileWalletOptions';
       walletBtns.style.cssText='display:flex;gap:8px;margin-bottom:12px';
+      const wlinks = links;
       walletBtns.innerHTML=
-        '<button onclick="smartOpenWallet(links.imtoken.deeplink,links.imtoken.download)" style="flex:1;padding:10px;border-radius:10px;background:#1a73e8;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">🔷 imToken</button>'+
-        '<button onclick="smartOpenWallet(links.okx.deeplink,links.okx.download)" style="flex:1;padding:10px;border-radius:10px;background:#121212;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">⭕ OKX</button>'+
-        '<button onclick="smartOpenWallet(links.tp.deeplink,links.tp.download)" style="flex:1;padding:10px;border-radius:10px;background:#1b9c5e;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">🟢 TP</button>'+
-        '<button onclick="smartOpenWallet(links.metamask.deeplink,links.metamask.download)" style="flex:1;padding:10px;border-radius:10px;background:#f6851b;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">🦊 MetaMask</button>';
+        '<button onclick="smartOpenWallet(window._walletLinks.imtoken.deeplink,window._walletLinks.imtoken.download)" style="flex:1;padding:10px;border-radius:10px;background:#1a73e8;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">🔷 imToken</button>'+
+        '<button onclick="smartOpenWallet(window._walletLinks.okx.deeplink,window._walletLinks.okx.download)" style="flex:1;padding:10px;border-radius:10px;background:#121212;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">⭕ OKX</button>'+
+        '<button onclick="smartOpenWallet(window._walletLinks.tp.deeplink,window._walletLinks.tp.download)" style="flex:1;padding:10px;border-radius:10px;background:#1b9c5e;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">🟢 TP</button>'+
+        '<button onclick="smartOpenWallet(window._walletLinks.metamask.deeplink,window._walletLinks.metamask.download)" style="flex:1;padding:10px;border-radius:10px;background:#f6851b;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">🦊 MetaMask</button>';
       btn.parentNode.insertBefore(walletBtns, btn.nextSibling);
       
       status('💡 手机用户推荐用 imToken 或 OKX，国内用户首选','');
@@ -447,7 +453,7 @@ $('connectBtn').onclick=connect;
 async function loadPolls(){
   show('tabPolls');$('tabPolls').innerHTML='<div class="text-xs text-center" style="padding:20px">加载投票列表...</div>';
   try{
-    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     const count=await tvRO.pollCount();
     if(count===0n){$('tabPolls').innerHTML='<div class="text-xs text-center" style="padding:40px;color:#666">暂无投票<br><br>📌 管理员可以创建第一个投票</div>';return}
@@ -478,7 +484,7 @@ async function showPoll(pid){
   $('pollDetail').innerHTML='<div class="text-xs text-center" style="padding:20px">加载投票详情...</div>';
   
   try{
-    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     const poll=await tvRO.getPoll(pid);
     const opt=await tvRO.getPollOptions(pid);
@@ -809,7 +815,7 @@ async function loadFaucet(){
   }
   
   try{
-    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
     const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
     
     const [claimed,amount,bal,remaining,totalC,isActive]=await Promise.all([
@@ -909,7 +915,7 @@ async function loadAdmin(){
   }
   
   try{
-    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
     const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
@@ -973,7 +979,7 @@ async function adminSearchAddr(){
   const result=$('adminSearchResult');
   result.textContent='查询中...';
   try{
-    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const p=new ethers.JsonRpcProvider('https://base.llamarpc.com');
     const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     
