@@ -757,13 +757,18 @@ async function doClaim(pid){
 // ============ 签到 ============
 async function loadCheckin(){
   show('tabCheckin');
-  if(!address){$('checkinBtn').style.display='none';$('streakNum').textContent='?';return}
+  $('checkinBtn').style.display='none';
+  if(!address){$('streakNum').textContent='?';$('discountInfo').innerHTML='请先连接钱包';return}
   $('checkinBtn').style.display='block';
   try{
-    const [ci,streak]=await tv.getCheckInStatus(address);
-    const discount=await tv.getVoteDiscountBP(address);
+    // 使用只读 provider（不依赖钱包连接）
+    const p=new ethers.JsonRpcProvider(getRpc());
+    const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
+    const [ci,streak]=await tvRO.getCheckInStatus(address);
+    let discount=0n;
+    try{discount=await tvRO.getVoteDiscountBP(address);}catch(e){}
     $('streakNum').textContent=streak.toString();
-    $('discountInfo').innerHTML=`当前折扣: ${discount/100}% ${discount>=5000?'🎉':''}<br>
+    $('discountInfo').innerHTML=`当前折扣: ${Number(discount)/100}% ${discount>=5000n?'🎉':''}<br>
       ${streak<7?`还差 ${7-streak} 天到 9 折`:streak<14?`还差 ${14-streak} 天到 8 折`:streak<30?`还差 ${30-streak} 天到 5 折`:'🎉 5折满级'}`;
     
     const btn=$('checkinBtn');
@@ -786,12 +791,22 @@ async function loadCheckin(){
       }
       $('badgeList').innerHTML=bhtml||'<span class="text-xs" style="color:#666">暂无徽章，多投票吧！</span>';
     }
-  }catch(e){}
+  }catch(e){
+    $('discountInfo').innerHTML='加载失败，请检查网络';
+  }
 }
 
 async function doCheckIn(){
-  try{status('⏳ 签到中...','');const tx=await tv.checkIn();await tx.wait();status('✅ 签到成功！','success');loadCheckin();}
-  catch(e){status('❌ '+e.message.slice(0,60),'error')}
+  if(!address||!tv){status('请先连接钱包','error');return}
+  try{
+    status('⏳ 签到中...','');
+    const tx=await tv.checkIn();
+    await tx.wait();
+    status('✅ 签到成功！','success');
+    loadCheckin();
+  }catch(e){
+    status('❌ '+e.message.slice(0,60),'error');
+  }
 }
 
 // ============ 🚰 免费领币 ============
