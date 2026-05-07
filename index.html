@@ -318,7 +318,7 @@ function getMobileWalletLink(){
   const url = encodeURIComponent(location.href);
   return {
     metamask: 'https://metamask.app.link/dapp/' + location.host + location.pathname + location.search,
-    okx: 'https://www.okx.com/download?deeplink=' + url
+    okx: 'https://www.okx.com/web3/wallet/dapp/url?dappUrl=' + url
   };
 }
 
