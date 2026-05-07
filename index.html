@@ -97,9 +97,11 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
 <!-- Tabs -->
 <div class="tabs" id="tabBar">
   <button class="tab active" data-tab="polls">🗳 投票</button>
+  <button class="tab" data-tab="create">✏️ 创建</button>
   <button class="tab" data-tab="faucet">🚰 免费领币</button>
   <button class="tab" data-tab="checkin">📅 签到</button>
   <button class="tab" data-tab="me">👤 我的</button>
+  <button class="tab" data-tab="admin">📊 数据</button>
 </div>
 
 <!-- Loading placeholder -->
@@ -112,7 +114,45 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
 <div id="pollDetail" class="hidden"></div>
 
 <!-- ====== 创建投票 ====== -->
-<div id="createPoll" class="hidden"></div>
+<!-- ====== 创建投票 ====== -->
+<div id="createPoll" class="hidden">
+  <div class="card">
+    <div class="card-title">📝 创建新投票</div>
+    
+    <div style="margin-bottom:12px">
+      <label>投票标题</label>
+      <input type="text" id="createTitle" placeholder="如：第一届歌手大赛总决赛" style="width:100%;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:14px;outline:none">
+    </div>
+    
+    <div style="margin-bottom:12px">
+      <label>每票费用（TVT）</label>
+      <input type="number" id="createVoteCost" value="1" min="0.001" step="0.001" style="width:100%;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:14px;outline:none">
+      <div class="text-xs" style="color:#666;margin-top:4px">1 TVT = 1 票，重要投票可以设更高</div>
+    </div>
+    
+    <div style="margin-bottom:12px">
+      <label>结束时间</label>
+      <input type="datetime-local" id="createEndTime" style="width:100%;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:14px;outline:none;color-scheme:dark">
+      <div class="text-xs" style="color:#666;margin-top:4px">精确到分钟。开始时间=现在，结束时间=你选的时刻</div>
+    </div>
+    
+    <div style="margin-bottom:12px">
+      <label>投票选项</label>
+      <div id="createOptionsList"></div>
+      <div style="display:flex;gap:4px;margin-top:6px">
+        <input type="text" id="createNewOption" placeholder="输入选项名称" style="flex:1;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:13px;outline:none">
+        <button class="copy-btn" onclick="addCreateOption()" style="padding:8px 16px">➕ 添加</button>
+      </div>
+      <div class="text-xs" style="color:#666;margin-top:4px">至少2个选项，最多10个</div>
+    </div>
+    
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="submit-btn" onclick="doCreatePoll()" style="flex:1">🚀 创建投票</button>
+      <button class="submit-btn" onclick="resetCreateForm()" style="flex:0;padding:12px 16px;background:rgba(255,255,255,0.05);color:#888">重置</button>
+    </div>
+    <div id="createStatus" class="text-xs" style="color:#888;margin-top:8px;text-align:center"></div>
+  </div>
+</div>
 
 <!-- ====== 免费领币 ====== -->
 <div id="tabFaucet" class="hidden">
@@ -170,6 +210,28 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
   </div>
 </div>
 
+<!-- ====== 管理数据 ====== -->
+<div id="tabAdmin" class="hidden">
+  <div class="card">
+    <div class="card-title">📊 TVT 概览</div>
+    <div style="font-size:13px;color:#aaa;line-height:1.8" id="adminTvtInfo">加载中...</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚰 水龙头数据</div>
+    <div style="font-size:13px;color:#aaa;line-height:1.8" id="adminFaucetInfo">加载中...</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🗳 投票数据</div>
+    <div style="font-size:13px;color:#aaa;line-height:1.8" id="adminPollInfo">加载中...</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔍 查询地址</div>
+    <div style="display:flex;gap:4px">
+      <input type="text" id="adminSearchAddr" placeholder="输入钱包地址 0x..." style="flex:1">
+      <button class="copy-btn" onclick="adminSearchAddr()">查询</button>
+    </div>
+    <div style="font-size:12px;color:#aaa;margin-top:8px;line-height:1.6" id="adminSearchResult"></div>
+  </div>
 </div>
 
 <div class="status-bar" id="statusBar"></div>
@@ -197,7 +259,7 @@ const TV_ABI = [
   "function getWinnerReward(uint256,address) view returns (uint256)",
   "function getReferralInfo(address) view returns (address,uint256,uint256,bool)"
 ];
-const TVT_ABI = ["function balanceOf(address) view returns (uint256)", "function approve(address,uint256)", "function decimals() view returns (uint8)"];
+const TVT_ABI = ["function balanceOf(address) view returns (uint256)", "function approve(address,uint256)", "function decimals() view returns (uint8)", "function totalSupply() view returns (uint256)"];
 const BADGE_ABI = ["function balanceOf(address,uint256) view returns (uint256)", "function badgeInfo(uint256) view returns (string,string,string)"];
 const FAUCET_ABI = [
   "function claim()",
@@ -226,23 +288,101 @@ document.querySelectorAll('.tab').forEach(tab=>{
   tab.onclick=()=>{
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
-    ['tabPolls','pollDetail','createPoll','tabFaucet','tabCheckin','tabMe'].forEach(id=>hide(id));
+    ['tabPolls','pollDetail','createPoll','tabFaucet','tabCheckin','tabMe','tabAdmin'].forEach(id=>hide(id));
     currentTab = tab.dataset.tab;
     if(currentTab==='polls')loadPolls();
+    if(currentTab==='create'){resetCreateForm();show('createPoll');}
     if(currentTab==='faucet')loadFaucet();
     if(currentTab==='checkin')loadCheckin();
     if(currentTab==='me')loadMe();
+    if(currentTab==='admin')loadAdmin();
   }
 });
 
 // ============ 连接钱包 ============
+
+// 检测可用钱包
+function detectWallet(){
+  if(window.ethereum) return window.ethereum;
+  if(window.okxwallet) return window.okxwallet;
+  return null;
+}
+
+// 是否是手机浏览器
+function isMobile(){
+  return /Mobi|Android|iPhone|iPod|iPad/i.test(navigator.userAgent);
+}
+
+// 获取 MetaMask/OKX 手机 App 直达链接
+function getMobileWalletLink(){
+  const url = encodeURIComponent(location.href);
+  return {
+    metamask: 'https://metamask.app.link/dapp/' + location.host + location.pathname + location.search,
+    okx: 'https://www.okx.com/download?deeplink=' + url
+  };
+}
+
+// 获取钱包名称
+function getWalletName(){
+  if(window.okxwallet) return 'OKX Wallet';
+  if(window.ethereum){
+    if(window.ethereum.isMetaMask) return 'MetaMask';
+    if(window.ethereum.isTrust) return 'Trust Wallet';
+    if(window.ethereum.isCoinbaseWallet) return 'Coinbase Wallet';
+    if(window.ethereum.isOKXWallet) return 'OKX Wallet';
+    return '钱包';
+  }
+  return '';
+}
+
 async function connect(){
-  if(!window.ethereum){status('请安装 MetaMask 或 OKX Wallet','error');return}
+  const wallet = detectWallet();
+  if(!wallet){
+    if(isMobile()){
+      // 手机浏览器 → 提供 MetaMask App 直达链接
+      const links = getMobileWalletLink();
+      $('connectBtn').textContent='📱 在钱包 App 中打开';
+      $('connectBtn').onclick=()=>{};
+      $('connectBtn').style.background='linear-gradient(135deg,#f6851b,#e2761b)';
+      
+      // 替换按钮为钱包选择
+      const btn=$('connectBtn');
+      btn.innerHTML='<div style="font-size:12px">📱 选择钱包打开</div>';
+      
+      // 在按钮下方添加钱包选项
+      const walletBtns = document.createElement('div');
+      walletBtns.id='mobileWalletOptions';
+      walletBtns.style.cssText='display:flex;gap:8px;margin-bottom:12px';
+      walletBtns.innerHTML=
+        '<a href="'+links.metamask+'" style="flex:1;padding:12px;border-radius:10px;background:#f6851b;color:#fff;text-align:center;text-decoration:none;font-size:14px;font-weight:600">🦊 MetaMask</a>'+
+        '<a href="'+links.okx+'" style="flex:1;padding:12px;border-radius:10px;background:#121212;color:#fff;text-align:center;text-decoration:none;font-size:14px;font-weight:600">⭕ OKX</a>';
+      btn.parentNode.insertBefore(walletBtns, btn.nextSibling);
+      
+      status('💡 点上方按钮跳转到 MetaMask/OKX App 内打开，自动连接钱包','');
+    }else{
+      status('⚠️ 请安装 MetaMask 浏览器插件（chrome应用商店搜索 MetaMask）','error');
+    }
+    return;
+  }
+  
   try{
-    provider=new ethers.BrowserProvider(window.ethereum);
+    provider=new ethers.BrowserProvider(wallet);
+    // 用 eth_requestAccounts 弹窗连接（替代 eth_accounts 静默检查）
+    await wallet.request({method:'eth_requestAccounts'});
     signer=await provider.getSigner();address=await signer.getAddress();
     const net=await provider.getNetwork();
-    if(net.chainId!==8453n){status('⚠️ 请切换到 Base 主网','error');return}
+    if(net.chainId!==8453n){
+      // 提示切链
+      try{
+        await wallet.request({
+          method:'wallet_switchEthereumChain',
+          params:[{chainId:'0x2105'}] // Base = 8453 = 0x2105
+        });
+      }catch(e){status('⚠️ 请手动切换到 Base 主网','error');return}
+      // 重新连接
+      const net2=await provider.getNetwork();
+      if(net2.chainId!==8453n){status('⚠️ 请切换到 Base 主网','error');return}
+    }
     tv=new ethers.Contract(TV_ADDR,TV_ABI,signer);
     tvt=new ethers.Contract(TVT_ADDR,TVT_ABI,signer);
     badgeC=new ethers.Contract(BADGE_ADDR,BADGE_ABI,provider);
@@ -338,12 +478,39 @@ async function showPoll(pid){
       <div class="card">
         <div class="card-title">🗳 投票选项</div>`;
     
+    // 计算排名
+    const rankData = [];
+    for(let i=0;i<opt.names.length;i++){
+      rankData.push({idx:i, votes:opt.counts[i], name:opt.names[i]});
+    }
+    rankData.sort((a,b)=>b.votes>a.votes?1:(b.votes<a.votes?-1:0)); // bigint compare
+    for(let i=0;i<rankData.length;i++){
+      rankData[i].rank = (i>0 && rankData[i].votes===rankData[i-1].votes) ? rankData[i-1].rank : i+1;
+    }
+    rankData.sort((a,b)=>a.idx-b.idx); // 恢复原顺序
+    
     for(let i=0;i<opt.names.length;i++){
       const voteCount=ethers.formatEther(opt.counts[i]);
       const disabled=poll.status!==1||poll.finalized?'style="opacity:.5"':'';
+      const rd=rankData[i];
+      const rankBadge=rd.rank<=3?['🥇','🥈','🥉'][rd.rank-1]:'#'+rd.rank;
+      
+      // 距上一位差多少票
+      let gapHtml='';
+      if(rd.rank>1){
+        const aboveIdx=rankData.findIndex(r=>r.rank===rd.rank-1);
+        if(aboveIdx>=0){
+          const gap=Number(rankData[aboveIdx].votes-rd.votes)/1e18;
+          if(gap>0) gapHtml=`<span class="text-xs" style="color:#888;font-size:10px">距上一位差 ${gap.toFixed(0)} 票</span>`;
+        }
+      }
+      
       html+=`<button class="option-btn" onclick="doVote(${pid},${i})" ${disabled}>
-        <span>${opt.names[i]}</span>
-        <span class="votes">${voteCount} TVT</span>
+        <span><span style="font-size:12px;margin-right:4px">${rankBadge}</span>${opt.names[i]}</span>
+        <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+          <span class="votes">${voteCount} TVT</span>
+          ${gapHtml}
+        </span>
       </button>`;
     }
     
@@ -634,6 +801,208 @@ async function loadMe(){
   }catch(e){}
 }
 
+
+// ============ 📊 管理数据 ============
+const OWNER_ADDR = "0x4E83CC45BC9f121f08D4cBd0558599cD2091d55a";
+
+async function loadAdmin(){
+  show('tabAdmin');
+  if(!address){$('adminTvtInfo').textContent='请先连接钱包';return;}
+  
+  // 检查是否是管理员
+  if(address.toLowerCase()!==OWNER_ADDR.toLowerCase()){
+    $('adminTvtInfo').textContent='⛔ 仅管理员可查看';
+    $('adminFaucetInfo').textContent='';
+    $('adminPollInfo').textContent='';
+    return;
+  }
+  
+  try{
+    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
+    const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
+    const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
+    
+    // TVT 概览
+    const [totalSupply,ownerBal] = await Promise.all([
+      tvtRO.totalSupply(),
+      tvtRO.balanceOf(OWNER_ADDR)
+    ]);
+    $('adminTvtInfo').innerHTML=
+      `总供应量: ${ethers.formatEther(totalSupply)} TVT<br>`+
+      `Owner 余额: ${ethers.formatEther(ownerBal)} TVT<br>`+
+      `TVT 地址: <code style="font-size:10px">${TVT_ADDR}</code>`;
+    
+    // 水龙头
+    try{
+      const [claimed,amount,bal,remaining,totalC,isActive]=await Promise.all([
+        faucetRO.hasClaimed(address), // 只是占位
+        faucetRO.claimAmount(),
+        faucetRO.faucetBalance(),
+        faucetRO.remainingClaims(),
+        faucetRO.totalClaimed(),
+        faucetRO.active()
+      ]);
+      $('adminFaucetInfo').innerHTML=
+        `已领取人数: ${totalC} 人<br>`+
+        `池子余额: ${ethers.formatEther(bal)} TVT<br>`+
+        `每次领取: ${ethers.formatEther(amount)} TVT<br>`+
+        `剩余可领: ${remaining} 次<br>`+
+        `状态: ${isActive?'✅ 运行中':'⛔ 暂停'}`+
+        `<br>水龙头: <code style="font-size:10px">${FAUCET_ADDR}</code>`;
+    }catch(e){$('adminFaucetInfo').textContent='加载失败: '+e.message.slice(0,40);}
+    
+    // 投票数据
+    try{
+      const count=await tvRO.pollCount();
+      let totalVotes=0n, totalPrize=0n;
+      if(count>0n){
+        for(let i=0;i<Number(count);i++){
+          try{
+            const poll=await tvRO.getPoll(i);
+            totalPrize+=poll.totalPrizePool;
+            const opts=await tvRO.getPollOptions(i);
+            for(const v of opts.counts) totalVotes+=v;
+          }catch(e){}
+        }
+      }
+      $('adminPollInfo').innerHTML=
+        `总投票数: ${count}<br>`+
+        `总投票量: ${ethers.formatEther(totalVotes)} TVT<br>`+
+        `总奖池: ${ethers.formatEther(totalPrize)} TVT<br>`+
+        `投票合约: <code style="font-size:10px">${TV_ADDR}</code>`;
+    }catch(e){$('adminPollInfo').textContent='加载失败: '+e.message.slice(0,40);}
+    
+  }catch(e){$('adminTvtInfo').textContent='加载失败: '+e.message.slice(0,40);}
+}
+
+async function adminSearchAddr(){
+  const addr=$('adminSearchAddr').value.trim();
+  if(!addr||addr.length<10){status('请输入有效地址','error');return;}
+  const result=$('adminSearchResult');
+  result.textContent='查询中...';
+  try{
+    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
+    const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
+    
+    const [bal,ci]=await Promise.all([
+      tvtRO.balanceOf(addr).catch(()=>'?'),
+      tvRO.getCheckInStatus(addr).catch(()=>['?','?'])
+    ]);
+    let html=`TVT 余额: ${typeof bal==='bigint'?ethers.formatEther(bal):'?'} TVT<br>`;
+    if(ci&&ci.length>1){
+      html+=`今日签到: ${ci[0]?'✅ 已签':'❌ 未签'}<br>`;
+      html+=`连续签到: ${ci[1]} 天`;
+    }
+    result.innerHTML=html;
+  }catch(e){result.textContent='查询失败: '+e.message.slice(0,40);}
+}
+
+
+
+// ============ 创建投票 ============
+let createOptions = [];
+
+function getDefaultEndTime(){
+  const d=new Date(Date.now()+24*3600000);
+  d.setMinutes(d.getMinutes()-d.getMinutes()%5);
+  const pad=n=>String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+
+function initCreateForm(){
+  createOptions = [];
+  renderCreateOptions();
+}
+function addCreateOption(){
+  const input=document.getElementById('createNewOption');
+  const name=input.value.trim();
+  if(!name){status('请输入选项名称','error');return;}
+  if(createOptions.length>=10){status('最多10个选项','error');return;}
+  createOptions.push(name);
+  input.value='';
+  renderCreateOptions();
+}
+function removeCreateOption(idx){
+  createOptions.splice(idx,1);
+  renderCreateOptions();
+}
+function renderCreateOptions(){
+  const list=document.getElementById('createOptionsList');
+  list.innerHTML=createOptions.map((name,i)=>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:4px;border-radius:6px;background:rgba(255,255,255,0.04);font-size:13px">'+
+      '<span>'+(i+1)+'. '+name+'</span>'+
+      '<span style="cursor:pointer;color:#ff4444;font-size:16px" onclick="removeCreateOption('+i+')">✕</span>'+
+    '</div>'
+  ).join('');
+}
+function resetCreateForm(){
+  document.getElementById('createTitle').value='';
+  document.getElementById('createVoteCost').value='1';
+  document.getElementById('createEndTime').value=getDefaultEndTime();
+  document.getElementById('createNewOption').value='';
+  document.getElementById('createStatus').textContent='';
+  initCreateForm();
+}
+
+async function doCreatePoll(){
+  if(!address){status('请先连接钱包','error');return;}
+  
+  const title=document.getElementById('createTitle').value.trim();
+  if(!title){status('请输入投票标题','error');return;}
+  
+  if(createOptions.length<2){status('至少需要2个选项','error');return;}
+  
+  const voteCostStr=document.getElementById('createVoteCost').value;
+  const voteCost=ethers.parseEther(voteCostStr);
+  if(voteCost<=0n){status('请输入有效的投票费用','error');return;}
+  
+  const endTimeStr=document.getElementById('createEndTime').value;
+  if(!endTimeStr){status('请选择结束时间','error');return;}
+  const endMs=new Date(endTimeStr).getTime();
+  const nowMs=Date.now();
+  if(endMs<=nowMs){status('结束时间必须在当前时间之后','error');return;}
+  const diffHours=(endMs-nowMs)/3600000;
+  if(diffHours<1){status('投票至少持续1小时','error');return;}
+  if(diffHours>720){status('最长30天','error');return;}
+  const duration=Math.round(diffHours);
+  
+  const statusEl=document.getElementById('createStatus');
+  statusEl.textContent='⏳ 准备创建...';
+  
+  try{
+    // 检查 TVT 余额
+    const bal=await tvt.balanceOf(address);
+    const creationFee=ethers.parseEther('1'); // 1 TVT 创建费
+    const totalNeeded=creationFee+voteCost; // 至少要有创建费
+    if(bal<totalNeeded){
+      statusEl.innerHTML='<span style="color:#ff4444">❌ TVT 余额不足，需要至少 1 TVT 创建费</span>';
+      return;
+    }
+    
+    statusEl.textContent='⏳ 第一步：授权 TVT...';
+    let tx=await tvt.approve(TV_ADDR, creationFee*2n);
+    await tx.wait();
+    
+    statusEl.textContent='⏳ 第二步：创建投票...';
+    tx=await tv.createPollQuick(title, createOptions, voteCost, duration);
+    statusEl.textContent='⏳ 交易已发送，等待确认...';
+    await tx.wait();
+    
+    statusEl.innerHTML='<span style="color:#00d4ff">✅ 投票创建成功！</span>';
+    status('🎉 投票已创建！','success');
+    resetCreateForm();
+    
+    // 切换到投票列表
+    document.querySelectorAll('.tab')[0].click();
+    setTimeout(loadPolls, 1000);
+  }catch(e){
+    statusEl.innerHTML='<span style="color:#ff4444">❌ '+e.message.slice(0,60)+'</span>';
+  }
+}
+
+
 // ============ 初始化 ============
 // 检查 URL 参数
 const params=new URLSearchParams(location.search);
@@ -654,10 +1023,18 @@ if(params.get('poll')){
     },3000);
   }
 }else{
-  if(window.ethereum){
-    window.ethereum.request({method:'eth_accounts'}).then(accs=>{if(accs.length>0)connect()});
-  }
-  $('loadingMsg').classList.add('hidden');
+  // 延迟等钱包注入（解决 MetaMask 加载慢的问题）
+  setTimeout(()=>{
+    const wallet = detectWallet();
+    if(wallet){
+      wallet.request({method:'eth_accounts'}).then(accs=>{
+        if(accs.length>0)connect();
+        else $('loadingMsg').classList.add('hidden');
+      }).catch(()=>$('loadingMsg').classList.add('hidden'));
+    }else{
+      $('loadingMsg').innerHTML='<div style="padding:40px;text-align:center"><div style="font-size:36px;margin-bottom:12px">🔗</div><div style="font-size:14px;color:#888;margin-bottom:8px">点击上方按钮连接钱包</div><div class="text-xs" style="color:#666">支持 MetaMask / OKX Wallet</div></div>';
+    }
+  },500);
   if(params.get('claim')){
     // 只带了 ?claim=1，没有 poll → 引导连接钱包
     $('loadingMsg').innerHTML='<div style="padding:40px"><div style="font-size:36px;margin-bottom:12px">🚰</div><div style="font-size:14px;color:#888;margin-bottom:8px">免费领 TVT</div><div class="text-xs" style="color:#666">请先连接钱包 → 点击上方 "免费领币" 标签领取</div></div>';

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>📊 TVT 管理后台</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js">
+
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a1a;color:#e0e0e0;min-height:100vh}
+.container{max-width:600px;width:100%;margin:0 auto;padding:16px}
+.header{text-align:center;padding:20px 0 16px}
+.header h1{font-size:22px;font-weight:700;background:linear-gradient(135deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{color:#888;font-size:12px;margin-top:2px}
+.header .tag{display:inline-block;padding:2px 10px;border-radius:6px;background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.2);color:#ff4444;font-size:10px;margin-top:4px}
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;margin-bottom:12px}
+.card-title{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.connect-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;transition:all .2s;margin-bottom:12px}
+input{width:100%;padding:12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:14px;margin-bottom:8px;outline:none}
+input:focus{border-color:#00d4ff}
+label{font-size:12px;color:#888;display:block;margin-bottom:4px}
+.copy-btn{padding:6px 12px;border-radius:6px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.1);color:#00d4ff;font-size:12px;cursor:pointer}
+.submit-btn{width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#00d4ff,#7b2ff7);color:#fff;transition:all .2s;margin-top:4px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-box{padding:12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);text-align:center}
+.stat-box .num{font-size:24px;font-weight:700;background:linear-gradient(135deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-box .lbl{font-size:11px;color:#666;margin-top:2px}
+.status-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 16px;font-size:13px;text-align:center;display:none;z-index:100;backdrop-filter:blur(10px);white-space:nowrap}
+.status-bar.show{display:block}
+.status-bar.success{border-color:#00d4ff;color:#00d4ff}
+.status-bar.error{border-color:#ff4444;color:#ff4444}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.1);border-top-color:#00d4ff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.data-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
+.data-row:last-child{border:none}
+.data-label{color:#888}
+.data-value{color:#e0e0e0;font-weight:500;text-align:right}
+code{font-size:10px;color:#00d4ff;word-break:break-all}
+.hidden{display:none!important}
+.text-center{text-align:center}
+.mt-8{margin-top:8px}
+.text-xs{font-size:12px;color:#666}
+</style>
+</head>
+<body>
+
+<div class="container" id="app">
+
+<div class="header">
+  <h1>📊 TVT 管理后台</h1>
+  <p>Tide Vote — 数据面板</p>
+  <div class="tag">🔒 仅管理员</div>
+</div>
+
+<button class="connect-btn" id="connectBtn">🔗 连接管理员钱包</button>
+
+<div class="text-center text-xs" id="loadingMsg" style="padding:40px;display:block">连接钱包后查看数据...</div>
+
+<!-- ====== 数据面板 ====== -->
+<div id="dashboard" class="hidden">
+
+  <!-- 概览卡片 -->
+  <div class="card">
+    <div class="card-title">📊 TVT 概览</div>
+    <div id="tvtOverview" class="text-center" style="padding:8px 0">
+      <div class="stat-grid">
+        <div class="stat-box"><div class="num" id="statTotalSupply">-</div><div class="lbl">总供应</div></div>
+        <div class="stat-box"><div class="num" id="statOwnerBal">-</div><div class="lbl">Owner 余额</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 水龙头 -->
+  <div class="card">
+    <div class="card-title">🚰 水龙头</div>
+    <div id="faucetData"></div>
+  </div>
+
+  <!-- 投票数据 -->
+  <div class="card">
+    <div class="card-title">🗳 投票数据</div>
+    <div id="pollData"></div>
+  </div>
+
+  <!-- 合约地址 -->
+  <div class="card" style="background:rgba(0,0,0,0.1)">
+    <div class="card-title">📋 合约地址</div>
+    <div id="contractAddrs"></div>
+  </div>
+
+  <!-- 地址查询 -->
+  <div class="card">
+    <div class="card-title">🔍 地址查询</div>
+    <div style="display:flex;gap:4px">
+      <input type="text" id="searchAddr" placeholder="0x..." style="flex:1;margin:0">
+      <button class="copy-btn" onclick="doSearchAddr()">查询</button>
+    </div>
+    <div id="searchResult" style="font-size:13px;color:#aaa;margin-top:8px;line-height:1.6"></div>
+  </div>
+
+  <!-- 操作 -->
+  <div class="card">
+    <div class="card-title">⚙️ 快捷操作</div>
+    <div style="display:flex;gap:4px">
+      <button class="submit-btn" onclick="refreshAll()" style="flex:1">🔄 刷新数据</button>
+    </div>
+    <div style="margin-top:8px">
+      <a href="/tvt" style="display:block;text-align:center;padding:8px;border-radius:8px;background:rgba(0,212,255,0.08);color:#00d4ff;font-size:13px;text-decoration:none">← 返回投票主页</a>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<div class="status-bar" id="statusBar"></div>
+
+<script>
+// ============ 合约地址 ============
+const TVT_ADDR = "0xEBbcc7e0AC8bDec9903C72F60EBaA6169EfB2B72";
+const TV_ADDR  = "0x6b71557813c451dAE9F8519335af7BB44694E5Ac";
+const BADGE_ADDR = "0xfFedbDcA61253AF32B389C40Ed3894B605EF428b";
+const FAUCET_ADDR = "0xFA99D22B14A4e2F95ba96ff0900767Ab8bc24bbF";
+const OWNER_ADDR = "0x4E83CC45BC9f121f08D4cBd0558599cD2091d55a";
+
+const TVT_ABI = ["function balanceOf(address) view returns (uint256)", "function totalSupply() view returns (uint256)"];
+const TV_ABI = [
+  "function pollCount() view returns (uint256)",
+  "function getPoll(uint256) view returns (string,address,uint256,uint256,uint256,bool,uint256,uint16,bool,uint8)",
+  "function getPollOptions(uint256) view returns (string[],uint256[])",
+  "function getCheckInStatus(address) view returns (bool,uint256)"
+];
+const FAUCET_ABI = [
+  "function claimAmount() view returns (uint256)",
+  "function faucetBalance() view returns (uint256)",
+  "function remainingClaims() view returns (uint256)",
+  "function totalClaimed() view returns (uint256)",
+  "function active() view returns (bool)"
+];
+
+let provider, signer, address;
+
+function $(id){return document.getElementById(id)}
+function show(id){const e=$(id);if(e)e.classList.remove('hidden')}
+function hide(id){const e=$(id);if(e)e.classList.add('hidden')}
+let st;function status(m,t){const b=$('statusBar');b.innerHTML=m;b.className='status-bar show'+(t?' '+t:'');clearTimeout(st);if(t)st=setTimeout(()=>b.classList.remove('show'),5000)}
+
+// ============ 连接 ============
+async function connect(){
+  if(!window.ethereum){status('请安装 MetaMask 或 OKX Wallet','error');return}
+  try{
+    provider=new ethers.BrowserProvider(window.ethereum);
+    signer=await provider.getSigner();address=await signer.getAddress();
+    const net=await provider.getNetwork();
+    if(net.chainId!==8453n){status('⚠️ 请切换到 Base 主网','error');return}
+    
+    // 检查是否是管理员
+    if(address.toLowerCase()!==OWNER_ADDR.toLowerCase()){
+      $('connectBtn').textContent='⛔ 非管理员地址';
+      $('loadingMsg').innerHTML='<div style="padding:40px;color:#ff4444">⛔ 这不是管理员钱包<br><br>请切换 Owner 钱包连接</div>';
+      return;
+    }
+    
+    $('connectBtn').textContent='✅ 管理员: '+address.slice(0,6)+'...'+address.slice(-4);
+    $('loadingMsg').classList.add('hidden');
+    show('dashboard');
+    refreshAll();
+  }catch(e){status('连接失败','error')}
+}
+$('connectBtn').onclick=connect;
+
+// ============ 加载数据 ============
+async function refreshAll(){
+  status('🔄 加载数据...','');
+  await Promise.all([loadTvtOverview(), loadFaucetData(), loadPollData(), loadContractAddrs()]);
+  status('✅ 数据已更新','success');
+}
+
+async function loadTvtOverview(){
+  try{
+    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
+    const [total,ownerBal]=await Promise.all([
+      tvtRO.totalSupply(),
+      tvtRO.balanceOf(OWNER_ADDR)
+    ]);
+    $('statTotalSupply').textContent=formatNum(total);
+    $('statOwnerBal').textContent=formatNum(ownerBal);
+  }catch(e){$('statTotalSupply').textContent='?';$('statOwnerBal').textContent='?';}
+}
+
+async function loadFaucetData(){
+  try{
+    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
+    const [amount,bal,remaining,totalC,isActive]=await Promise.all([
+      faucetRO.claimAmount(),
+      faucetRO.faucetBalance(),
+      faucetRO.remainingClaims(),
+      faucetRO.totalClaimed(),
+      faucetRO.active()
+    ]);
+    $('faucetData').innerHTML=
+      `<div class="data-row"><span class="data-label">已领取人数</span><span class="data-value">${totalC} 人</span></div>`+
+      `<div class="data-row"><span class="data-label">池子余额</span><span class="data-value">${ethers.formatEther(bal)} TVT</span></div>`+
+      `<div class="data-row"><span class="data-label">每次领取</span><span class="data-value">${ethers.formatEther(amount)} TVT</span></div>`+
+      `<div class="data-row"><span class="data-label">剩余可领</span><span class="data-value">${remaining} 次</span></div>`+
+      `<div class="data-row"><span class="data-label">状态</span><span class="data-value" style="color:${isActive?'#00d4ff':'#ff4444'}">${isActive?'✅ 运行中':'⛔ 暂停'}</span></div>`;
+  }catch(e){$('faucetData').innerHTML='<div class="text-xs">加载失败</div>';}
+}
+
+async function loadPollData(){
+  try{
+    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
+    const count=await tvRO.pollCount();
+    let totalVotes=0n, totalPrize=0n;
+    if(count>0n){
+      for(let i=0;i<Math.min(Number(count),50);i++){
+        try{
+          const poll=await tvRO.getPoll(i);
+          totalPrize+=poll.totalPrizePool;
+          const opts=await tvRO.getPollOptions(i);
+          for(const v of opts.counts) totalVotes+=v;
+        }catch(e){}
+      }
+    }
+    $('pollData').innerHTML=
+      `<div class="data-row"><span class="data-label">总投票数</span><span class="data-value">${count}</span></div>`+
+      `<div class="data-row"><span class="data-label">总投票量</span><span class="data-value">${ethers.formatEther(totalVotes)} TVT</span></div>`+
+      `<div class="data-row"><span class="data-label">总奖池</span><span class="data-value">${ethers.formatEther(totalPrize)} TVT</span></div>`;
+  }catch(e){$('pollData').innerHTML='<div class="text-xs">加载失败</div>';}
+}
+
+function loadContractAddrs(){
+  $('contractAddrs').innerHTML=
+    `<div class="data-row"><span class="data-label">TVT</span><span class="data-value"><code>${TVT_ADDR}</code></span></div>`+
+    `<div class="data-row"><span class="data-label">TideVote</span><span class="data-value"><code>${TV_ADDR}</code></span></div>`+
+    `<div class="data-row"><span class="data-label">Badge</span><span class="data-value"><code>${BADGE_ADDR}</code></span></div>`+
+    `<div class="data-row"><span class="data-label">Faucet</span><span class="data-value"><code>${FAUCET_ADDR}</code></span></div>`;
+}
+
+async function doSearchAddr(){
+  const addr=$('searchAddr').value.trim();
+  if(!addr||addr.length<10){status('请输入有效地址','error');return;}
+  $('searchResult').textContent='查询中...';
+  try{
+    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
+    const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
+    const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
+    
+    const [bal,ci,fc] = await Promise.all([
+      tvtRO.balanceOf(addr).catch(()=>0n),
+      tvRO.getCheckInStatus(addr).catch(()=>[false,0]),
+      faucetRO.totalClaimed().catch(()=>0n) // 仅做可读性检查
+    ]);
+    
+    let html=`<div class="data-row"><span class="data-label">地址</span><span class="data-value"><code>${addr.slice(0,10)}...${addr.slice(-6)}</code></span></div>`;
+    html+=`<div class="data-row"><span class="data-label">TVT 余额</span><span class="data-value">${ethers.formatEther(bal)} TVT</span></div>`;
+    html+=`<div class="data-row"><span class="data-label">今日签到</span><span class="data-value">${ci[0]?'✅ 已签到':'❌ 未签到'}</span></div>`;
+    html+=`<div class="data-row"><span class="data-label">连续签到</span><span class="data-value">${ci[1]} 天</span></div>`;
+    $('searchResult').innerHTML=html;
+  }catch(e){$('searchResult').textContent='查询失败: '+e.message.slice(0,40);}
+}
+
+// ============ 工具 ============
+function formatNum(bn){
+  return Number(ethers.formatEther(bn)).toLocaleString('zh-CN',{maximumFractionDigits:0})+' TVT';
+}
+
+// ============ 自动连接 ============
+if(window.ethereum){
+  window.ethereum.request({method:'eth_accounts'}).then(accs=>{if(accs.length>0)connect()});
+}
+
+
+</script>
+
+</body>
+</html>
