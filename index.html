@@ -548,10 +548,10 @@ async function showPoll(pid){
     }
     rankData.sort((a,b)=>a.idx-b.idx);
     let selectedOption = -1; // 记录当前选中的选项
+    const pollActive=poll.status===1&&!poll.finalized;
     
     for(let i=0;i<opt.names.length;i++){
       const voteCount=ethers.formatEther(opt.counts[i]);
-      const active=poll.status===1&&!poll.finalized;
       const rd=rankData[i];
       const rankBadge=rd.rank<=3?['🥇','🥈','🥉'][rd.rank-1]:'#'+rd.rank;
       
@@ -565,7 +565,7 @@ async function showPoll(pid){
       }
       
       // 🔘 圆圈选择 + 点击选择
-      html+=`<div class="option-row" onclick="selectVoteOption(${pid},${i})" id="optRow_${pid}_${i}" style="display:flex;align-items:center;padding:12px 14px;border-radius:12px;margin-bottom:6px;background:rgba(255,255,255,0.03);border:2px solid transparent;cursor:${active?'pointer':'default'};transition:all .2s">
+      html+=`<div class="option-row" onclick="selectVoteOption(${pid},${i})" id="optRow_${pid}_${i}" style="display:flex;align-items:center;padding:12px 14px;border-radius:12px;margin-bottom:6px;background:rgba(255,255,255,0.03);border:2px solid transparent;cursor:${pollActive?'pointer':'default'};transition:all .2s">
         <span style="width:22px;height:22px;border-radius:50%;border:2px solid #666;display:flex;align-items:center;justify-content:center;margin-right:10px;flex-shrink:0;font-size:11px;color:#666;transition:all .2s" id="optCircle_${pid}_${i}">○</span>
         <span style="flex:1;font-size:14px;font-weight:500">${rankBadge} ${opt.names[i]}</span>
         <span style="text-align:right;flex-shrink:0">
@@ -581,7 +581,7 @@ async function showPoll(pid){
         <input type="number" id="voteTimes" value="1" min="1" style="flex:1;text-align:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:14px;outline:none">
         <span style="padding:10px 0;color:#888;font-size:12px">× ${ethers.formatEther(poll.voteCost)} TVT/票</span>
       </div>
-      <button class="submit-btn" id="voteSubmitBtn" onclick="submitVote(${pid})" ${!active?'style="opacity:.5"':''}>🗳 投票</button>
+      <button class="submit-btn" id="voteSubmitBtn" onclick="submitVote(${pid})" ${!pollActive?'style="opacity:.5"':''}>🗳 投票</button>
       <div style="margin-top:4px;text-align:center">
         <a href="/?poll=${pid}&claim=1" style="display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border-radius:8px;background:rgba(0,212,255,0.08);border:1px dashed rgba(0,212,255,0.3);color:#00d4ff;font-size:12px;text-decoration:none;transition:all .2s"
            onmouseover="this.style.background='rgba(0,212,255,0.15)'" onmouseout="this.style.background='rgba(0,212,255,0.08)'">
