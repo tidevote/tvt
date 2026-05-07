@@ -760,6 +760,15 @@ async function loadCheckin(){
   $('checkinBtn').style.display='none';
   if(!address){$('streakNum').textContent='?';$('discountInfo').innerHTML='请先连接钱包';return}
   $('checkinBtn').style.display='block';
+  // 按钮绑定签到（移到 try 外面，确保始终执行）
+  const chkBtn=$('checkinBtn');
+  chkBtn.onclick=null;
+  try{chkBtn.removeEventListener('click',doCheckIn);}catch(e2){}
+  chkBtn.addEventListener('click',doCheckIn);
+  chkBtn.textContent='🔥 签到领奖励';
+  chkBtn.disabled=false;
+  chkBtn.removeAttribute('style');
+  
   try{
     // 使用只读 provider（不依赖钱包连接）
     const p=new ethers.JsonRpcProvider(getRpc());
@@ -771,11 +780,8 @@ async function loadCheckin(){
     $('discountInfo').innerHTML=`当前折扣: ${Number(discount)/100}% ${discount>=5000n?'🎉':''}<br>
       ${streak<7?`还差 ${7-streak} 天到 9 折`:streak<14?`还差 ${14-streak} 天到 8 折`:streak<30?`还差 ${30-streak} 天到 5 折`:'🎉 5折满级'}`;
     
-    // 按钮始终绑定签到函数（catch 之后也有效）
-    const btn=$('checkinBtn');
-    btn.onclick=doCheckIn;
-    if(ci){btn.textContent='✅ 今日已签到';btn.disabled=true;btn.style.background='rgba(0,212,255,.1)';}
-    else{btn.textContent='🔥 签到领奖励';btn.disabled=false;btn.removeAttribute('style');}
+    if(ci){chkBtn.textContent='✅ 今日已签到';chkBtn.disabled=true;chkBtn.style.background='rgba(0,212,255,.1)';}
+    else{chkBtn.textContent='🔥 签到领奖励';chkBtn.disabled=false;}
     
     // 徽章
     if(badgeC){
