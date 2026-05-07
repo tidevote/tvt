@@ -316,9 +316,13 @@ function isMobile(){
 // 获取 MetaMask/OKX 手机 App 直达链接
 function getMobileWalletLink(){
   const url = encodeURIComponent(location.href);
+  const hostPath = location.host + location.pathname + location.search;
+  const encodedUrl = encodeURIComponent(location.href);
   return {
-    metamask: 'https://metamask.app.link/dapp/' + location.host + location.pathname + location.search,
-    okx: '' // OKX使用复制链接方式
+    metamask: 'https://metamask.app.link/dapp/' + hostPath,
+    okx: 'https://www.okx.com/download?deeplink=okx%3A%2F%2Fwallet%2Fdapp%2Furl%3FdappUrl%3D' + encodedUrl,
+    imtoken: 'imtokenv2://navigate/DApp?url=' + encodedUrl,
+    tp: 'tp://dapp?url=' + encodedUrl
   };
 }
 
@@ -354,8 +358,9 @@ async function connect(){
       walletBtns.id='mobileWalletOptions';
       walletBtns.style.cssText='display:flex;gap:8px;margin-bottom:12px';
       walletBtns.innerHTML=
-        '<a href="'+links.metamask+'" style="flex:1;padding:12px;border-radius:10px;background:#f6851b;color:#fff;text-align:center;text-decoration:none;font-size:14px;font-weight:600">🦊 MetaMask</a>'+
-        '<button onclick="navigator.clipboard.writeText(location.href);status(\"✅ 链接已复制！打开 OKX App → 底部 Wallet → 点右上浏览器图标 → 粘贴访问\",\"success\")" style="flex:1;padding:12px;border-radius:10px;background:#121212;color:#fff;text-align:center;border:none;font-size:14px;font-weight:600;cursor:pointer">⭕ OKX 钱包</button>';
+        '<a href="'+links.metamask+'" style="flex:1;padding:10px;border-radius:10px;background:#f6851b;color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:600">🦊 MetaMask</a>'+
+        '<a href="'+links.imtoken+'" style="flex:1;padding:10px;border-radius:10px;background:#1a73e8;color:#fff;text-align:center;text-decoration:none;font-size:13px;font-weight:600">🔷 imToken</a>'+
+        '<button onclick="navigator.clipboard.writeText(location.href);status(\"✅ 链接已复制！到 OKX Wallet / TokenPocket 浏览器中粘贴访问\",\"success\")" style="flex:1;padding:10px;border-radius:10px;background:#121212;color:#fff;text-align:center;border:none;font-size:13px;font-weight:600;cursor:pointer">⭕ 其他钱包</button>';
       btn.parentNode.insertBefore(walletBtns, btn.nextSibling);
       
       status('💡 手机用户推荐用 MetaMask App 打开，或复制链接到 OKX 钱包浏览器中访问','');
