@@ -90,6 +90,9 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
 <div class="header">
   <h1>🌊 TVT</h1>
   <p>Tide Vote — 区块链投票平台</p>
+  <div style="position:absolute;top:16px;right:16px">
+    <button onclick="toggleLang()" id="langBtn" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;font-size:11px;cursor:pointer">🌐 EN</button>
+  </div>
 </div>
 
 <button class="connect-btn" id="connectBtn">🔗 连接钱包</button>
@@ -281,7 +284,7 @@ function show(id){const e=$(id);if(e)e.classList.remove('hidden')}
 function hide(id){const e=$(id);if(e)e.classList.add('hidden')}
 function timeAgo(t){const d=Date.now()/1000-t;if(d<60)return'刚刚';if(d<3600)return Math.floor(d/60)+'分钟前';if(d<86400)return Math.floor(d/3600)+'小时前';return Math.floor(d/86400)+'天前'}
 function tsToStr(t){const d=new Date(t*1000);return d.getMonth()+1+'月'+d.getDate()+'日 '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
-let st;function status(m,t){const b=$('statusBar');b.innerHTML=m;b.className='status-bar show'+(t?' '+t:'');clearTimeout(st);if(t)st=setTimeout(()=>b.classList.remove('show'),5000)}
+let st;function status(m,t){const b=$('statusBar');b.innerHTML=m;b.className='status-bar show'+(t?' '+t:'');clearTimeout(st);if(t=='error')st=setTimeout(()=>b.classList.remove('show'),15000);else if(t)st=setTimeout(()=>b.classList.remove('show'),5000)}
 
 // ============ 标签切换 ============
 document.querySelectorAll('.tab').forEach(tab=>{
@@ -800,23 +803,27 @@ async function loadCheckin(){
       $('badgeList').innerHTML=bhtml||'<span class="text-xs" style="color:#666">暂无徽章，多投票吧！</span>';
     }
   }catch(e){
-    $('discountInfo').innerHTML='加载失败，请检查网络';
+    $('discountInfo').innerHTML=t('loadingFailNetwork');
   }
 }
 
 async function doCheckIn(){
   if(!address||!tv){
-    status('请先连接钱包','error');
+    status(t('noWallet'),'error');
     return;
   }
   try{
-    status('⏳ 签到中...','');
+    var ciMsg=currentLang==='zh'?'⏳ 签到中...':'⏳ Checking in...';
+    status(ciMsg,'');
     const tx=await tv.checkIn();
     await tx.wait();
-    status('✅ 签到成功！','success');
+    status(t('checkinSuccess'),'success');
     loadCheckin();
   }catch(e){
-    status('❌ '+e.message.slice(0,60),'error');
+    var errMsg=e&&e.message?e.message:'未知错误';
+    if(errMsg.includes('already checked')) errMsg=t('checkinError');
+    else if(currentLang==='en') errMsg='Error: '+errMsg.slice(0,40);
+    status('❌ '+errMsg.slice(0,60),'error');
   }
 }
 
@@ -1128,6 +1135,61 @@ async function doCreatePoll(){
   }
 }
 
+
+// ============ 多语言 ============
+let currentLang = 'zh';
+const LANG = {
+  tabPolls: {zh:'🗳 投票', en:'🗳 Polls'},
+  tabCreate: {zh:'✏️ 创建', en:'✏️ Create'},
+  tabFaucet: {zh:'🚰 免费领币', en:'🚰 Free Tokens'},
+  tabCheckin: {zh:'📅 签到', en:'📅 Check-in'},
+  tabMe: {zh:'👤 我的', en:'👤 Me'},
+  tabAdmin: {zh:'📊 数据', en:'📊 Data'},
+  connectWallet: {zh:'🔗 连接钱包', en:'🔗 Connect Wallet'},
+  loading: {zh:'加载中...', en:'Loading...'},
+  checkinBtn: {zh:'🔥 签到领奖励', en:'🔥 Check-in'},
+  checkinDone: {zh:'✅ 今日已签到', en:'✅ Checked in'},
+  checkinError: {zh:'今天已签到过了，明天再来吧 📅', en:'Already checked in today, come back tomorrow 📅'},
+  checkinSuccess: {zh:'✅ 签到成功！', en:'✅ Check-in success!'},
+  noWallet: {zh:'请先连接钱包', en:'Please connect wallet'},
+  claimBtn: {zh:'🚰 免费领取 TVT', en:'🚰 Claim Free TVT'},
+  claimDone: {zh:'✅ 你已经领取过了！', en:'✅ Already claimed!'},
+  vote: {zh:'🗳 投票', en:'🗳 Vote'},
+  freeClaim: {zh:'🚰 没有 TVT？免费领取 →', en:'🚰 No TVT? Claim free →'},
+  days_7: {zh:'还差 ', en:'Need '},
+  days_9: {zh:' 天到 9 折', en:' days for 10% off'},
+  days_8: {zh:' 天到 8 折', en:' days for 20% off'},
+  days_5: {zh:' 天到 5 折', en:' days for 50% off'},
+  maxDiscount: {zh:'🎉 5折满级', en:'🎉 Max 50% off'},
+  loadingFail: {zh:'加载失败', en:'Load failed'},
+  loadingFailNetwork: {zh:'加载失败，请检查网络', en:'Check your network connection'},
+  checkNet: {zh:'请检查网络', en:'Check network'},
+};
+
+function t(key){
+  var val = LANG[key];
+  return val ? (val[currentLang] || val['zh']) : key;
+}
+
+function toggleLang(){
+  currentLang = (currentLang === 'zh') ? 'en' : 'zh';
+  document.getElementById('langBtn').textContent = currentLang === 'zh' ? '🌐 EN' : '🌐 中';
+  // 刷新当前页面文本
+  refreshUILang();
+}
+function refreshUILang(){
+  // 更新标签
+  document.querySelectorAll('.tab').forEach(function(tab){
+    var key = tab.getAttribute('data-tab');
+    if(key){
+      var tKey = 'tab' + key.charAt(0).toUpperCase() + key.slice(1);
+      if(LANG[tKey]) tab.textContent = LANG[tKey][currentLang];
+    }
+  });
+  // 更新连接按钮
+  var cb = document.getElementById('connectBtn');
+  if(cb && !address) cb.textContent = t('connectWallet');
+}
 
 // ============ 初始化 ============
 // 检查 URL 参数
