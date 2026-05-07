@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🌊 TVT - Tide Vote</title>
+<title>🌊 TVT - 区块链投票平台</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -89,7 +89,7 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
 
 <div class="header">
   <h1>🌊 TVT</h1>
-  <p>Tide Vote — 娱乐投票平台</p>
+  <p>Tide Vote — 区块链投票平台</p>
 </div>
 
 <button class="connect-btn" id="connectBtn">🔗 连接钱包</button>
@@ -318,7 +318,7 @@ function getMobileWalletLink(){
   const url = encodeURIComponent(location.href);
   return {
     metamask: 'https://metamask.app.link/dapp/' + location.host + location.pathname + location.search,
-    okx: 'https://www.okx.com/web3/wallet/dapp/url?dappUrl=' + url
+    okx: 'https://www.okx.com/web3/wallet/dapp/url?dappUrl=' + encodeURIComponent(location.href)
   };
 }
 
@@ -355,7 +355,7 @@ async function connect(){
       walletBtns.style.cssText='display:flex;gap:8px;margin-bottom:12px';
       walletBtns.innerHTML=
         '<a href="'+links.metamask+'" style="flex:1;padding:12px;border-radius:10px;background:#f6851b;color:#fff;text-align:center;text-decoration:none;font-size:14px;font-weight:600">🦊 MetaMask</a>'+
-        '<a href="'+links.okx+'" style="flex:1;padding:12px;border-radius:10px;background:#121212;color:#fff;text-align:center;text-decoration:none;font-size:14px;font-weight:600">⭕ OKX</a>';
+        '<a href="'+links.okx+'" style="flex:1;padding:12px;border-radius:10px;background:#121212;color:#fff;text-align:center;text-decoration:none;font-size:14px;font-weight:600">⭕ OKX 钱包</a>';
       btn.parentNode.insertBefore(walletBtns, btn.nextSibling);
       
       status('💡 点上方按钮跳转到 MetaMask/OKX App 内打开，自动连接钱包','');
