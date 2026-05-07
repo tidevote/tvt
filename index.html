@@ -483,36 +483,53 @@ async function showPoll(pid){
     for(let i=0;i<opt.names.length;i++){
       rankData.push({idx:i, votes:opt.counts[i], name:opt.names[i]});
     }
-    rankData.sort((a,b)=>b.votes>a.votes?1:(b.votes<a.votes?-1:0)); // bigint compare
+    rankData.sort((a,b)=>b.votes>a.votes?1:(b.votes<a.votes?-1:0));
     for(let i=0;i<rankData.length;i++){
       rankData[i].rank = (i>0 && rankData[i].votes===rankData[i-1].votes) ? rankData[i-1].rank : i+1;
     }
-    rankData.sort((a,b)=>a.idx-b.idx); // 恢复原顺序
+    rankData.sort((a,b)=>a.idx-b.idx);
+    let selectedOption = -1; // 记录当前选中的选项
     
     for(let i=0;i<opt.names.length;i++){
       const voteCount=ethers.formatEther(opt.counts[i]);
-      const disabled=poll.status!==1||poll.finalized?'style="opacity:.5"':'';
+      const active=poll.status===1&&!poll.finalized;
       const rd=rankData[i];
       const rankBadge=rd.rank<=3?['🥇','🥈','🥉'][rd.rank-1]:'#'+rd.rank;
       
-      // 距上一位差多少票
       let gapHtml='';
       if(rd.rank>1){
         const aboveIdx=rankData.findIndex(r=>r.rank===rd.rank-1);
         if(aboveIdx>=0){
           const gap=Number(rankData[aboveIdx].votes-rd.votes)/1e18;
-          if(gap>0) gapHtml=`<span class="text-xs" style="color:#888;font-size:10px">距上一位差 ${gap.toFixed(0)} 票</span>`;
+          if(gap>0) gapHtml=`<span style="color:#888;font-size:10px">距上一位差 ${gap.toFixed(0)} 票</span>`;
         }
       }
       
-      html+=`<button class="option-btn" onclick="doVote(${pid},${i})" ${disabled}>
-        <span><span style="font-size:12px;margin-right:4px">${rankBadge}</span>${opt.names[i]}</span>
-        <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-          <span class="votes">${voteCount} TVT</span>
+      // 🔘 圆圈选择 + 点击选择
+      html+=`<div class="option-row" onclick="selectVoteOption(${pid},${i})" id="optRow_${pid}_${i}" style="display:flex;align-items:center;padding:12px 14px;border-radius:12px;margin-bottom:6px;background:rgba(255,255,255,0.03);border:2px solid transparent;cursor:${active?'pointer':'default'};transition:all .2s">
+        <span style="width:22px;height:22px;border-radius:50%;border:2px solid #666;display:flex;align-items:center;justify-content:center;margin-right:10px;flex-shrink:0;font-size:11px;color:#666;transition:all .2s" id="optCircle_${pid}_${i}">○</span>
+        <span style="flex:1;font-size:14px;font-weight:500">${rankBadge} ${opt.names[i]}</span>
+        <span style="text-align:right;flex-shrink:0">
+          <span style="display:block;font-size:13px;font-weight:600;color:#aaa">${voteCount} TVT</span>
           ${gapHtml}
         </span>
-      </button>`;
+      </div>`;
     }
+    
+    // 投票按钮 + 票数输入
+    html+=`<div style="margin-top:8px">
+      <div style="display:flex;gap:4px;margin-bottom:8px">
+        <input type="number" id="voteTimes" value="1" min="1" style="flex:1;text-align:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:14px;outline:none">
+        <span style="padding:10px 0;color:#888;font-size:12px">× ${ethers.formatEther(poll.voteCost)} TVT/票</span>
+      </div>
+      <button class="submit-btn" id="voteSubmitBtn" onclick="submitVote(${pid})" ${!active?'style="opacity:.5"':''}>🗳 投票</button>
+      <div style="margin-top:4px;text-align:center">
+        <a href="/?poll=${pid}&claim=1" style="display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border-radius:8px;background:rgba(0,212,255,0.08);border:1px dashed rgba(0,212,255,0.3);color:#00d4ff;font-size:12px;text-decoration:none;transition:all .2s"
+           onmouseover="this.style.background='rgba(0,212,255,0.15)'" onmouseout="this.style.background='rgba(0,212,255,0.08)'">
+          🚰 没有 TVT？免费领取 →
+        </a>
+      </div>
+    </div>`;
     
     html+=`<div style="margin-top:8px">
       <div style="display:flex;gap:4px">
@@ -613,7 +630,41 @@ function copyShareText(pid) {
 }
 
 // ============ 投票 ============
-async function doVote(pid,oi){
+// 选中的选项
+let selectedPollVote = -1;
+
+function selectVoteOption(pid, idx){
+  selectedPollVote = idx;
+  // 重置所有选项的圆圈样式
+  const rows = document.querySelectorAll('[id^="optRow_'+pid+'_"]');
+  rows.forEach(r=>{
+    const i = r.id.split('_').pop();
+    const circle = document.getElementById('optCircle_'+pid+'_'+i);
+    if(circle){
+      circle.innerHTML = '○';
+      circle.style.borderColor = '#666';
+      circle.style.color = '#666';
+      r.style.borderColor = 'transparent';
+      r.style.background = 'rgba(255,255,255,0.03)';
+    }
+  });
+  // 高亮选中的
+  const selCircle = document.getElementById('optCircle_'+pid+'_'+idx);
+  const selRow = document.getElementById('optRow_'+pid+'_'+idx);
+  if(selCircle){
+    selCircle.innerHTML = '●';
+    selCircle.style.borderColor = '#00d4ff';
+    selCircle.style.color = '#00d4ff';
+  }
+  if(selRow){
+    selRow.style.borderColor = 'rgba(0,212,255,0.4)';
+    selRow.style.background = 'rgba(0,212,255,0.05)';
+  }
+}
+
+async function submitVote(pid){
+  const oi = selectedPollVote;
+  if(oi<0||oi===null){status('请先选择一个选项','error');return}
   if(!address){status('请先连接钱包','error');return}
   const times=parseInt($('voteTimes')?.value||1);
   if(times<1){status('至少投1票','error');return}
@@ -633,7 +684,8 @@ async function doVote(pid,oi){
       }else{throw e}
     }
     await tx.wait();
-    status(`✅ 投票成功！${times} 票已投给选项 ${oi}`,'success');
+    status('✅ 投票成功！','success');
+    selectedPollVote = -1;
     showPoll(pid);
   }catch(e){status('❌ '+e.message.slice(0,60),'error')}
 }
