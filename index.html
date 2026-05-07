@@ -99,8 +99,8 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
 
 <!-- Tabs -->
 <div class="tabs" id="tabBar">
-  <button class="tab" data-tab="home">🏠 首页</button>
-  <button class="tab active" data-tab="polls">🗳 投票</button>
+  <button class="tab active" data-tab="home">🏠 首页</button>
+  <button class="tab" data-tab="polls">🗳 投票</button>
   <button class="tab" data-tab="create">✏️ 创建</button>
   <button class="tab" data-tab="faucet">🚰 免费领币</button>
   <button class="tab" data-tab="checkin">📅 签到</button>
@@ -194,7 +194,8 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <span style="font-size:18px">🎯</span>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">发起者抽成</div><div style="font-size:11px;color:#666">每场投票发起者享有平台费 20% 分成</div></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">发起者抽成</div><div style="font-size:11px;color:#666">每场投票发起者享有平台费分成</div></div>
+        <span style="font-size:16px;font-weight:700;color:#00d4ff">20%</span>
       </div>
     </div>
   </div>
@@ -1091,11 +1092,13 @@ if(params.get('poll')){
     }
   },500);
   if(params.get('claim')){
+    show('tabHome');
     // 只带了 ?claim=1，没有 poll → 引导连接钱包
     $('loadingMsg').innerHTML='<div style="padding:40px"><div style="font-size:36px;margin-bottom:12px">🚰</div><div style="font-size:14px;color:#888;margin-bottom:8px">免费领 TVT</div><div class="text-xs" style="color:#666">请先连接钱包 → 点击上方 "免费领币" 标签领取</div></div>';
   }else{
     $('loadingMsg').classList.add('hidden');
-    loadPolls();
+    // 默认显示首页
+    document.querySelectorAll('.tab')[0].click();
   }
 }
 </script>
