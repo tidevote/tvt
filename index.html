@@ -111,113 +111,7 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
 <div class="text-center text-xs" id="loadingMsg" style="padding:40px">加载中...</div>
 
 <!-- ====== 项目首页 ====== -->
-<div id="tabHome" class="hidden">
-  <div class="card" style="text-align:center;padding:24px 20px;background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(123,47,247,0.08));border-color:rgba(0,212,255,0.15)">
-    <div style="font-size:40px;margin-bottom:8px">🌊</div>
-    <div style="font-size:22px;font-weight:700;background:linear-gradient(135deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Tide Vote</div>
-    <div style="font-size:13px;color:#888;margin-top:4px">区块链投票平台 — 透明、公正、有趣</div>
-    <div style="font-size:12px;color:#666;margin-top:2px">Decentralized Voting — Transparent, Fair, Fun</div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">📖 什么是 TVT？</div>
-    <div style="font-size:13px;color:#aaa;line-height:1.8">
-      <b>TVT (Tide Vote Token)</b> 是基于 <b>Base 链</b>的娱乐投票生态代币。
-      <br><br>
-      在这里你可以：
-    </div>
-    <div style="margin-top:8px">
-      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-        <span style="font-size:20px">🗳️</span>
-        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">创建投票</div><div style="font-size:11px;color:#666">发起比赛、评选、决策，设置每票费用</div></div>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-        <span style="font-size:20px">🏆</span>
-        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">投票赢奖</div><div style="font-size:11px;color:#666">投票消耗 TVT 进入奖池，开奖随机赢奖金</div></div>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-        <span style="font-size:20px">🚰</span>
-        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">免费领币</div><div style="font-size:11px;color:#666">新用户免费领 10 TVT，零门槛参与</div></div>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-        <span style="font-size:20px">📅</span>
-        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">每日签到</div><div style="font-size:11px;color:#666">每天领 1 TVT，连续签到享投票折扣</div></div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span style="font-size:20px">🤝</span>
-        <div><div style="font-size:13px;font-weight:600;color:#e0e0e0">邀请裂变</div><div style="font-size:11px;color:#666">邀请好友投票赚佣金，共建社区</div></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">🎯 快速开始</div>
-    <div style="font-size:13px;color:#aaa;line-height:1.8">
-      1. 🔗 <b>连接钱包</b> — 支持 MetaMask / OKX / imToken<br>
-      2. 🚰 点<b>「免费领币」</b>领 10 TVT<br>
-      3. 🗳️ 去<b>「投票」</b>参与或创建投票<br>
-      4. 📅 每天<b>「签到」</b>免费领 TVT<br>
-      5. 🤝 邀请好友一起玩
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">🔗 合约地址</div>
-    <div style="font-size:11px;color:#666;line-height:1.8">
-      TVT 代币:<br>
-      <code style="font-size:10px;color:#00d4ff;word-break:break-all">0xEBbcc7e0AC8bDec9903C72F60EBaA6169EfB2B72</code><br><br>
-      TideVote 投票:<br>
-      <code style="font-size:10px;color:#00d4ff;word-break:break-all">0x6b71557813c451dAE9F8519335af7BB44694E5Ac</code>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">💎 经济模型</div>
-    <div style="font-size:13px;color:#aaa;line-height:1.8">
-      每一笔投票费用的分配：
-    </div>
-    <div style="margin-top:8px">
-      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-        <span style="font-size:18px">🏆</span>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">80% 奖池</div><div style="font-size:11px;color:#666">投票者共享奖池，开奖随机赢取 TVT</div></div>
-        <span style="font-size:16px;font-weight:700;color:#16a34a">80%</span>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-        <span style="font-size:18px">🔥</span>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">5% 销毁</div><div style="font-size:11px;color:#666">每票烧掉 5%，TVT 持续通缩，越来越值钱</div></div>
-        <span style="font-size:16px;font-weight:700;color:#f97316">5%</span>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-        <span style="font-size:18px">🤝</span>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">15% 运维基金</div><div style="font-size:11px;color:#666">用于平台运营、开发、市场推广，公开透明</div></div>
-        <span style="font-size:16px;font-weight:700;color:#8b5cf6">15%</span>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span style="font-size:18px">🎯</span>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">发起者抽成</div><div style="font-size:11px;color:#666">每场投票发起者享有平台费分成</div></div>
-        <span style="font-size:16px;font-weight:700;color:#00d4ff">20%</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="card" style="border-color:rgba(123,47,247,0.15);background:rgba(123,47,247,0.03)">
-    <div class="card-title">🔒 公开透明</div>
-    <div style="font-size:13px;color:#aaa;line-height:1.8">
-      <span style="display:block;margin-bottom:6px">✅ 所有数据存储在 <b>Base 区块链</b>上，任何人可查</span>
-      <span style="display:block;margin-bottom:6px">✅ 智能合约开源，代码公开审计</span>
-      <span style="display:block;margin-bottom:6px">✅ 投票结果不可篡改、不可删除</span>
-      <span style="display:block;margin-bottom:6px">✅ 奖池分配由智能合约自动执行，无人工干预</span>
-      <span style="display:block">✅ 运维基金每一笔支出链上可追溯</span>
-    </div>
-  </div>
-
-  <div class="card" style="text-align:center;padding:16px">
-    <div style="font-size:11px;color:#555;line-height:1.6">
-      🌊 Tide Vote — Powered by Base<br>
-      Decentralized. Transparent. Fair.
-    </div>
-  </div>
-</div>
+<div id="tabHome" class="hidden"></div>
 
 <!-- ====== 投票列表 ====== -->
 <div id="tabPolls" class="hidden"></div>
@@ -246,6 +140,12 @@ label{font-size:12px;color:#888;display:block;margin-bottom:4px}
       <label>结束时间</label>
       <input type="datetime-local" id="createEndTime" style="width:100%;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:14px;outline:none;color-scheme:dark">
       <div class="text-xs" style="color:#666;margin-top:4px">精确到分钟。开始时间=现在，结束时间=你选的时刻</div>
+    </div>
+    
+    <div style="margin-bottom:12px">
+      <label>每人封顶票数</label>
+      <input type="number" id="createMaxVotes" value="0" min="0" style="width:100%;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e0e0e0;font-size:14px;outline:none">
+      <div class="text-xs" style="color:#666;margin-top:4px">0=不限制，填10=每个钱包最多投10票</div>
     </div>
     
     <div style="margin-bottom:12px">
@@ -380,7 +280,7 @@ document.querySelectorAll('.tab').forEach(tab=>{
     tab.classList.add('active');
     ['tabHome','tabPolls','pollDetail','createPoll','tabFaucet','tabCheckin','tabMe'].forEach(id=>hide(id));
     currentTab = tab.dataset.tab;
-    if(currentTab==='home'){show('tabHome');}
+    if(currentTab==='home'){show('tabHome');renderHome();}
     if(currentTab==='polls')loadPolls();
     if(currentTab==='create'){resetCreateForm();show('createPoll');}
     if(currentTab==='faucet')loadFaucet();
@@ -733,6 +633,18 @@ async function showPoll(pid){
           <button onclick="navigator.clipboard.writeText('${shareUrl}');status('✅ 已复制，去微信群粘贴！','success')" style="flex:1;padding:6px;border-radius:6px;background:rgba(7,193,96,0.2);border:1px solid rgba(7,193,96,0.3);color:#07c160;font-size:11px;cursor:pointer">💚 微信</button>
         </div>
       </div>
+      
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:10px;color:#888;margin-bottom:4px">📱 扫码直达</div>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(shareUrl)}" style="width:100px;height:100px;border-radius:8px;border:1px solid rgba(255,255,255,0.1)">
+        </div>
+        <div style="flex:2">
+          <div style="font-size:10px;color:#888;margin-bottom:4px">🔌 嵌入网站</div>
+          <textarea id="embedCode_${pid}" rows="2" style="width:100%;padding:6px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#aaa;font-size:10px;resize:none;outline:none" readonly><iframe src="${shareUrl}" width="100%" height="600" frameborder="0" style="border:none"></iframe></textarea>
+          <button class="copy-btn" style="margin-top:4px;width:100%" onclick="navigator.clipboard.writeText(document.getElementById('embedCode_${pid}').value);status('✅ 嵌入代码已复制！粘贴到你的网站HTML中','success')">📋 复制嵌入代码</button>
+        </div>
+      </div>
     </div>`;
     
     $('pollDetail').innerHTML=html;
@@ -1039,6 +951,63 @@ const LANG = {
   noWallet: {zh:'请先连接钱包', en:'Please connect wallet'},
   loadingFail: {zh:'加载失败', en:'Load failed'},
   loadingFailNetwork: {zh:'加载失败，请检查网络', en:'Please check your network'},
+  
+  // 首页介绍
+  homeTitle: {zh:'区块链投票平台 — 透明、公正、有趣', en:'Blockchain Voting — Transparent, Fair & Fun'},
+  homeSub: {zh:'去中心化投票 — 公开透明，不可篡改', en:'Decentralized Voting — Open, Immutable'},
+  whatIsTvt: {zh:'📖 什么是 TVT？', en:'📖 What is TVT?'},
+  whatIsTvtDesc1: {zh:'是基于 Base 链的娱乐投票生态代币。', en:'is a voting ecosystem token on Base chain.'},
+  whatIsTvtHere: {zh:'在这里你可以：', en:'Here you can:'},
+  createPoll: {zh:'创建投票', en:'Create Polls'},
+  createPollDesc: {zh:'发起比赛、评选、决策，设置每票费用', en:'Launch contests, polls & decisions'},
+  voteWin: {zh:'投票赢奖', en:'Vote & Win'},
+  voteWinDesc: {zh:'投票消耗 TVT 进入奖池，开奖随机赢奖金', en:'Vote TVT into prize pool, win randomly'},
+  freeClaimTitle: {zh:'免费领币', en:'Free Tokens'},
+  freeClaimDesc: {zh:'新用户免费领 10 TVT，零门槛参与', en:'New users get 10 free TVT'},
+  dailyCheckin: {zh:'每日签到', en:'Daily Check-in'},
+  dailyCheckinDesc: {zh:'每天领 1 TVT，连续签到享投票折扣', en:'Get 1 TVT daily, streak discounts'},
+  inviteFriends: {zh:'邀请裂变', en:'Referral Rewards'},
+  inviteFriendsDesc: {zh:'邀请好友投票赚佣金，共建社区', en:'Earn commissions from referrals'},
+  
+  // 快速开始
+  quickStart: {zh:'🎯 快速开始', en:'🎯 Quick Start'},
+  qs1: {zh:'连接钱包', en:'Connect Wallet'},
+  qs1Desc: {zh:'支持 MetaMask / OKX / imToken', en:'MetaMask / OKX / imToken'},
+  qs2: {zh:'免费领币', en:'Claim Free TVT'},
+  qs2Desc: {zh:'领 10 TVT', en:'Get 10 free TVT'},
+  qs3: {zh:'投票/创建', en:'Vote or Create'},
+  qs3Desc: {zh:'参与或创建投票', en:'Join or launch polls'},
+  qs4: {zh:'每日签到', en:'Daily Check-in'},
+  qs4Desc: {zh:'每天免费领 TVT', en:'Get free TVT daily'},
+  qs5: {zh:'邀请好友', en:'Invite Friends'},
+  qs5Desc: {zh:'一起玩赚佣金', en:'Earn together'},
+  
+  // 经济模型
+  tokenomics: {zh:'💎 经济模型', en:'💎 Tokenomics'},
+  prizePool40: {zh:'40% 奖池', en:'40% Prize Pool'},
+  prizePool40Desc: {zh:'投票者共享奖池，开奖随机赢取 TVT', en:'Shared by voters, random winners'},
+  burn: {zh:'5% 销毁', en:'5% Burn'},
+  burnDesc: {zh:'每票烧掉 5%，TVT 持续通缩', en:'5% burned per vote, deflationary'},
+  platform: {zh:'15% 运维基金', en:'15% Operations'},
+  platformDesc: {zh:'用于平台运营、开发、市场推广', en:'Platform development & marketing'},
+  creatorShare: {zh:'40% 发起者分红', en:'40% Creator Reward'},
+  creatorShareDesc: {zh:'投票发起者可领取 40% 投票费分红', en:'Poll creators earn 40% of vote fees'},
+  
+  // 公开透明
+  transparency: {zh:'🔒 公开透明', en:'🔒 Transparency'},
+  trans1: {zh:'所有数据存储在 Base 区块链上，任何人可查', en:'All data on Base chain, verifiable by anyone'},
+  trans2: {zh:'智能合约开源，代码公开审计', en:'Open source smart contracts'},
+  trans3: {zh:'投票结果不可篡改、不可删除', en:'Vote results are immutable'},
+  trans4: {zh:'奖池自动分配，无人工干预', en:'Prize pool auto-distributed'},
+  trans5: {zh:'运维支出链上可追溯', en:'All expenses on-chain traceable'},
+  trans6: {zh:'TVT 总供应上限 10 亿，公开透明', en:'Max supply 1B TVT, fully transparent'},
+  poweredBy: {zh:'🌊 Tide Vote — Powered by Base', en:'🌊 Tide Vote — Powered by Base'},
+  poweredBySub: {zh:'Decentralized. Transparent. Fair.', en:'Decentralized. Transparent. Fair.'},
+  
+  // 合约地址
+  contractTitle: {zh:'🔗 合约地址', en:'🔗 Contract Addresses'},
+  tvtToken: {zh:'TVT 代币:', en:'TVT Token:'},
+  tideVote: {zh:'TideVote 投票:', en:'TideVote Contract:'},
 };
 
 function t(key){ return LANG[key] ? (LANG[key][currentLang]||LANG[key]['zh']) : key; }
@@ -1048,8 +1017,64 @@ function toggleLang(){
   document.getElementById('langBtn').textContent = currentLang === 'zh' ? '🌐 EN' : '🌐 中';
   refreshUILang();
 }
+function renderHome(){
+  var isEn = currentLang === 'en';
+  document.getElementById('tabHome').innerHTML = ''+
+    '<div class="card" style="text-align:center;padding:24px 20px;background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(123,47,247,0.08));border-color:rgba(0,212,255,0.15)">'+
+      '<div style="font-size:40px;margin-bottom:8px">🌊</div>'+
+      '<div style="font-size:22px;font-weight:700;background:linear-gradient(135deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Tide Vote</div>'+
+      '<div style="font-size:13px;color:#888;margin-top:4px">'+t('homeTitle')+'</div>'+
+      '<div style="font-size:12px;color:#666;margin-top:2px">'+t('homeSub')+'</div>'+
+    '</div>'+
+    '<div class="card">'+
+      '<div class="card-title">'+t('whatIsTvt')+'</div>'+
+      '<div style="font-size:13px;color:#aaa;line-height:1.8">'+
+        '<b>TVT</b> '+t('whatIsTvtDesc1')+'<br><br>'+t('whatIsTvtHere')+
+      '</div>'+
+      '<div style="margin-top:8px">'+
+        '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><span style="font-size:20px">🗳️</span><div><div style="font-size:13px;font-weight:600;color:#e0e0e0">'+t('createPoll')+'</div><div style="font-size:11px;color:#666">'+t('createPollDesc')+'</div></div></div>'+
+        '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><span style="font-size:20px">🏆</span><div><div style="font-size:13px;font-weight:600;color:#e0e0e0">'+t('voteWin')+'</div><div style="font-size:11px;color:#666">'+t('voteWinDesc')+'</div></div></div>'+
+        '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><span style="font-size:20px">🚰</span><div><div style="font-size:13px;font-weight:600;color:#e0e0e0">'+t('freeClaimTitle')+'</div><div style="font-size:11px;color:#666">'+t('freeClaimDesc')+'</div></div></div>'+
+        '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><span style="font-size:20px">📅</span><div><div style="font-size:13px;font-weight:600;color:#e0e0e0">'+t('dailyCheckin')+'</div><div style="font-size:11px;color:#666">'+t('dailyCheckinDesc')+'</div></div></div>'+
+        '<div style="display:flex;gap:8px;align-items:center"><span style="font-size:20px">🤝</span><div><div style="font-size:13px;font-weight:600;color:#e0e0e0">'+t('inviteFriends')+'</div><div style="font-size:11px;color:#666">'+t('inviteFriendsDesc')+'</div></div></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card">'+
+      '<div class="card-title">'+t('tokenomics')+'</div>'+
+      '<div style="margin-top:8px">'+
+        '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><span style="font-size:18px">🏆</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">'+t('prizePool40')+'</div><div style="font-size:11px;color:#666">'+t('prizePool40Desc')+'</div></div><span style="font-size:16px;font-weight:700;color:#16a34a">40%</span></div>'+
+        '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><span style="font-size:18px">🎯</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">'+t('creatorShare')+'</div><div style="font-size:11px;color:#666">'+t('creatorShareDesc')+'</div></div><span style="font-size:16px;font-weight:700;color:#00d4ff">40%</span></div>'+
+        '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><span style="font-size:18px">🔥</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">'+t('burn')+'</div><div style="font-size:11px;color:#666">'+t('burnDesc')+'</div></div><span style="font-size:16px;font-weight:700;color:#f97316">5%</span></div>'+
+        '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><span style="font-size:18px">🤝</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#e0e0e0">'+t('platform')+'</div><div style="font-size:11px;color:#666">'+t('platformDesc')+'</div></div><span style="font-size:16px;font-weight:700;color:#8b5cf6">15%</span></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card" style="border-color:rgba(123,47,247,0.15);background:rgba(123,47,247,0.03)">'+
+      '<div class="card-title">'+t('transparency')+'</div>'+
+      '<div style="font-size:13px;color:#aaa;line-height:1.8">'+
+        '<span style="display:block;margin-bottom:6px">✅ '+t('trans1')+'</span>'+
+        '<span style="display:block;margin-bottom:6px">✅ '+t('trans2')+'</span>'+
+        '<span style="display:block;margin-bottom:6px">✅ '+t('trans3')+'</span>'+
+        '<span style="display:block;margin-bottom:6px">✅ '+t('trans4')+'</span>'+
+        '<span style="display:block;margin-bottom:6px">✅ '+t('trans5')+'</span>'+
+        '<span style="display:block">✅ '+t('trans6')+'</span>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card">'+
+      '<div class="card-title">'+t('contractTitle')+'</div>'+
+      '<div style="font-size:11px;color:#666;line-height:1.8">'+
+        t('tvtToken')+'<br><code style="font-size:10px;color:#00d4ff;word-break:break-all">0xEBbcc7e0AC8bDec9903C72F60EBaA6169EfB2B72</code><br><br>'+
+        t('tideVote')+'<br><code style="font-size:10px;color:#00d4ff;word-break:break-all">0x6b71557813c451dAE9F8519335af7BB44694E5Ac</code>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card" style="text-align:center;padding:16px">'+
+      '<div style="font-size:11px;color:#555;line-height:1.6">'+t('poweredBy')+'<br>'+t('poweredBySub')+'</div>'+
+    '</div>';
+}
+
 function refreshUILang(){
   document.getElementById('langBtn').textContent = currentLang === 'zh' ? '🌐 EN' : '🌐 中';
+  // 如果当前在首页，重新渲染
+  if(currentTab === 'home') renderHome();
   document.querySelectorAll('.tab').forEach(function(tab){
     var k = tab.getAttribute('data-tab');
     if(k){ var tk='tab'+k.charAt(0).toUpperCase()+k.slice(1); if(LANG[tk]) tab.textContent = LANG[tk][currentLang]; }
