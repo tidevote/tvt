@@ -147,6 +147,29 @@ function show(id){const e=$(id);if(e)e.classList.remove('hidden')}
 function hide(id){const e=$(id);if(e)e.classList.add('hidden')}
 let st;function status(m,t){const b=$('statusBar');b.innerHTML=m;b.className='status-bar show'+(t?' '+t:'');clearTimeout(st);if(t)st=setTimeout(()=>b.classList.remove('show'),5000)}
 
+// ============ RPC 缓存层 ============
+const rpcCache = new Map();
+const RPC_CACHE_TTL = 30_000;
+function createCachedProvider(url) {
+  const provider = new ethers.JsonRpcProvider(url);
+  const originalSend = provider.send.bind(provider);
+  provider.send = async function(method, params) {
+    const cacheable = method === 'eth_call' || method === 'eth_getBalance' || method === 'eth_blockNumber';
+    if (cacheable) {
+      const key = method + ':' + JSON.stringify(params);
+      const cached = rpcCache.get(key);
+      if (cached && Date.now() - cached.time < RPC_CACHE_TTL) return cached.data;
+    }
+    const result = await originalSend(method, params);
+    if (cacheable) {
+      const key = method + ':' + JSON.stringify(params);
+      rpcCache.set(key, { data: result, time: Date.now() });
+    }
+    return result;
+  };
+  return provider;
+}
+
 // ============ 连接 ============
 async function connect(){
   if(!window.ethereum){status('请安装 MetaMask 或 OKX Wallet','error');return}
@@ -180,7 +203,7 @@ async function refreshAll(){
 
 async function loadTvtOverview(){
   try{
-    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const p=createCachedProvider('https://base-rpc.publicnode.com');
     const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
     const [total,ownerBal]=await Promise.all([
       tvtRO.totalSupply(),
@@ -193,7 +216,7 @@ async function loadTvtOverview(){
 
 async function loadFaucetData(){
   try{
-    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const p=createCachedProvider('https://base-rpc.publicnode.com');
     const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
     const [amount,bal,remaining,totalC,isActive]=await Promise.all([
       faucetRO.claimAmount(),
@@ -213,7 +236,7 @@ async function loadFaucetData(){
 
 async function loadPollData(){
   try{
-    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const p=createCachedProvider('https://base-rpc.publicnode.com');
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     const count=await tvRO.pollCount();
     let totalVotes=0n, totalPrize=0n;
@@ -247,7 +270,7 @@ async function doSearchAddr(){
   if(!addr||addr.length<10){status('请输入有效地址','error');return;}
   $('searchResult').textContent='查询中...';
   try{
-    const p=new ethers.JsonRpcProvider('https://base-rpc.publicnode.com');
+    const p=createCachedProvider('https://base-rpc.publicnode.com');
     const tvtRO=new ethers.Contract(TVT_ADDR,TVT_ABI,p);
     const tvRO=new ethers.Contract(TV_ADDR,TV_ABI,p);
     const faucetRO=new ethers.Contract(FAUCET_ADDR,FAUCET_ABI,p);
